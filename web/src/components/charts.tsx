@@ -13,8 +13,8 @@ export function useWidth<T extends HTMLElement>(initial = 600) {
   return [ref, w] as const;
 }
 
-const AX = "rgba(148,163,184,.55)";
-const GRID = "rgba(148,163,184,.08)";
+const AX = "rgba(87,83,78,.55)";
+const GRID = "rgba(28,25,23,0.07)";
 
 export interface Series {
   key: string;
@@ -56,9 +56,9 @@ export function LineChart({ series, height = 260, xLabel, yLabel, xTicks, xForma
         {ticks.map((t) => (
           <text key={t} x={x(t)} y={height - m.b + 16} textAnchor="middle" fontSize={10} fill={AX} className="num">{xFormat(t)}</text>
         ))}
-        {xLabel && <text x={(m.l + w - m.r) / 2} y={height - 4} textAnchor="middle" fontSize={10.5} fill="rgba(148,163,184,.8)">{xLabel}</text>}
-        {yLabel && <text transform={`translate(11 ${(m.t + height - m.b) / 2}) rotate(-90)`} textAnchor="middle" fontSize={10.5} fill="rgba(148,163,184,.8)">{yLabel}</text>}
-        {identity && <line x1={x(xs[0])} y1={y(xs[0])} x2={x(xs[1])} y2={y(xs[1])} stroke="rgba(226,232,240,.35)" strokeDasharray="4 5" />}
+        {xLabel && <text x={(m.l + w - m.r) / 2} y={height - 4} textAnchor="middle" fontSize={10.5} fill="rgba(87,83,78,.8)">{xLabel}</text>}
+        {yLabel && <text transform={`translate(11 ${(m.t + height - m.b) / 2}) rotate(-90)`} textAnchor="middle" fontSize={10.5} fill="rgba(87,83,78,.8)">{yLabel}</text>}
+        {identity && <line x1={x(xs[0])} y1={y(xs[0])} x2={x(xs[1])} y2={y(xs[1])} stroke="rgba(28,25,23,.35)" strokeDasharray="4 5" />}
         {series.map((s) => s.band && (
           <motion.path key={s.key + "b"} d={area(s.band) ?? ""} fill={s.color} initial={{ opacity: 0 }} animate={{ opacity: highlight && highlight !== s.key ? 0.04 : 0.14 }} transition={{ duration: 0.8 }} />
         ))}
@@ -68,27 +68,27 @@ export function LineChart({ series, height = 260, xLabel, yLabel, xTicks, xForma
             <g key={s.key} onMouseEnter={() => onHover?.(s.key)} onMouseLeave={() => onHover?.(null)}>
               <motion.path d={line(s.points) ?? ""} fill="none" stroke={s.color} strokeWidth={s.width ?? 2} strokeDasharray={s.dashed ? "5 5" : undefined}
                 initial={{ pathLength: 0, opacity: 0 }} animate={{ pathLength: 1, opacity: dim ? 0.15 : 1 }} transition={{ duration: 1.2, delay: i * 0.08, ease: [0.22, 1, 0.36, 1] }}
-                style={{ filter: dim ? undefined : `drop-shadow(0 0 4px ${s.color}66)` }} />
+  />
               {s.dots && s.points.map((p, k) => (
-                <motion.circle key={k} cx={x(p.x)} cy={y(p.y)} r={3} fill="#04060c" stroke={s.color} strokeWidth={1.6} initial={{ scale: 0 }} animate={{ scale: 1, opacity: dim ? 0.2 : 1 }} transition={{ delay: 0.6 + k * 0.05 }} />
+                <motion.circle key={k} cx={x(p.x)} cy={y(p.y)} r={3} fill="#FFFFFF" stroke={s.color} strokeWidth={1.6} initial={{ scale: 0 }} animate={{ scale: 1, opacity: dim ? 0.2 : 1 }} transition={{ delay: 0.6 + k * 0.05 }} />
               ))}
             </g>
           );
         })}
         {nearest != null && nearest >= xs[0] && nearest <= xs[1] && (
-          <line x1={x(nearest)} x2={x(nearest)} y1={m.t} y2={height - m.b} stroke="rgba(103,232,249,.35)" />
+          <line x1={x(nearest)} x2={x(nearest)} y1={m.t} y2={height - m.b} stroke="rgba(41,82,204,.35)" />
         )}
       </svg>
       {nearest != null && nearest >= xs[0] && nearest <= xs[1] && (
-        <div className="pointer-events-none absolute top-2 z-10 min-w-[150px] rounded-xl border border-white/10 bg-ink-850/95 p-2.5 text-[11px] shadow-2xl backdrop-blur"
+        <div className="pointer-events-none absolute top-2 z-10 min-w-[150px] rounded-xl border border-stone-200 bg-white p-2.5 text-[11px] shadow-lg"
           style={{ left: Math.min(x(nearest) + 12, w - 190) }}>
-          <div className="mb-1 text-slate-400">{xLabel}: <span className="num text-slate-200">{xFormat(nearest)}</span></div>
+          <div className="mb-1 text-stone-500">{xLabel}: <span className="num text-stone-800">{xFormat(nearest)}</span></div>
           {series.map((s) => {
             const p = s.points.reduce((a, b) => (Math.abs(b.x - nearest) < Math.abs(a.x - nearest) ? b : a), s.points[0]);
             return p ? (
               <div key={s.key} className="flex items-center justify-between gap-3">
-                <span className="flex items-center gap-1.5 text-slate-300"><span className="h-1.5 w-3 rounded-full" style={{ background: s.color }} />{s.label}</span>
-                <span className="num text-slate-100">{yFormat(p.y)}</span>
+                <span className="flex items-center gap-1.5 text-stone-700"><span className="h-1.5 w-3 rounded-full" style={{ background: s.color }} />{s.label}</span>
+                <span className="num text-stone-900">{yFormat(p.y)}</span>
               </div>
             ) : null;
           })}
@@ -97,7 +97,7 @@ export function LineChart({ series, height = 260, xLabel, yLabel, xTicks, xForma
       {legend && (
         <div className="mt-1 flex flex-wrap gap-x-4 gap-y-1 px-1">
           {series.map((s) => (
-            <button key={s.key} onMouseEnter={() => onHover?.(s.key)} onMouseLeave={() => onHover?.(null)} className="flex items-center gap-1.5 text-[11px] text-slate-400 hover:text-slate-200">
+            <button key={s.key} onMouseEnter={() => onHover?.(s.key)} onMouseLeave={() => onHover?.(null)} className="flex items-center gap-1.5 text-[11px] text-stone-500 hover:text-stone-800">
               <span className="h-[3px] w-4 rounded-full" style={{ background: s.color, opacity: s.dashed ? 0.6 : 1 }} />{s.label}
             </button>
           ))}
@@ -124,7 +124,7 @@ export function Heatmap({ x, y, z, xLabel, yLabel, zLabel, height = 260, scheme 
         {y.map((yy, j) => (
           <g key={j}>
             {x.map((xx, i) => (
-              <motion.rect key={i} x={m.l + i * cw + 1} y={height - m.b - (j + 1) * ch + 1} width={cw - 2} height={ch - 2} rx={3}
+              <motion.rect key={i} x={m.l + i * cw + 1} y={height - m.b - (j + 1) * ch + 1} width={cw - 2} height={ch - 2} rx={2}
                 fill={col(z[j][i])} initial={{ opacity: 0 }} animate={{ opacity: hv && (hv.i !== i || hv.j !== j) ? 0.75 : 1 }} transition={{ delay: (i + j) * 0.012 }}
                 onMouseEnter={() => setHv({ i, j })} onMouseLeave={() => setHv(null)} />
             ))}
@@ -134,8 +134,8 @@ export function Heatmap({ x, y, z, xLabel, yLabel, zLabel, height = 260, scheme 
         {x.map((xx, i) => i % Math.ceil(x.length / 7) === 0 && (
           <text key={i} x={m.l + (i + 0.5) * cw} y={height - m.b + 15} textAnchor="middle" fontSize={10} fill={AX} className="num">{xFmt(xx)}</text>
         ))}
-        <text x={(m.l + w - m.r) / 2} y={height - 4} textAnchor="middle" fontSize={10.5} fill="rgba(148,163,184,.8)">{xLabel}</text>
-        <text transform={`translate(11 ${(m.t + height - m.b) / 2}) rotate(-90)`} textAnchor="middle" fontSize={10.5} fill="rgba(148,163,184,.8)">{yLabel}</text>
+        <text x={(m.l + w - m.r) / 2} y={height - 4} textAnchor="middle" fontSize={10.5} fill="rgba(87,83,78,.8)">{xLabel}</text>
+        <text transform={`translate(11 ${(m.t + height - m.b) / 2}) rotate(-90)`} textAnchor="middle" fontSize={10.5} fill="rgba(87,83,78,.8)">{yLabel}</text>
         <defs>
           <linearGradient id={`hm-${zLabel.length}`} x1="0" y1="1" x2="0" y2="0">
             {d3.range(0, 1.01, 0.1).map((t) => <stop key={t} offset={`${t * 100}%`} stopColor={scheme(t)} />)}
@@ -146,11 +146,11 @@ export function Heatmap({ x, y, z, xLabel, yLabel, zLabel, height = 260, scheme 
         <text x={w - m.r + 34} y={height - m.b} fontSize={10} fill={AX} className="num">{lo.toFixed(0)}h</text>
       </svg>
       {hv && (
-        <div className="pointer-events-none absolute z-10 rounded-xl border border-white/10 bg-ink-850/95 p-2.5 text-[11px] shadow-2xl backdrop-blur"
+        <div className="pointer-events-none absolute z-10 rounded-xl border border-stone-200 bg-white p-2.5 text-[11px] shadow-lg"
           style={{ left: Math.min(m.l + (hv.i + 1) * cw + 8, w - 170), top: Math.max(0, height - m.b - (hv.j + 1) * ch - 10) }}>
-          <div className="text-slate-400">{xLabel}: <span className="num text-slate-200">{xFmt(x[hv.i])}</span></div>
-          <div className="text-slate-400">{yLabel}: <span className="num text-slate-200">{yFmt(y[hv.j])}</span></div>
-          <div className="mt-1 text-cyan-300">{zLabel}: <span className="num">{z[hv.j][hv.i].toFixed(1)}h</span></div>
+          <div className="text-stone-500">{xLabel}: <span className="num text-stone-800">{xFmt(x[hv.i])}</span></div>
+          <div className="text-stone-500">{yLabel}: <span className="num text-stone-800">{yFmt(y[hv.j])}</span></div>
+          <div className="mt-1 text-accent-600">{zLabel}: <span className="num">{z[hv.j][hv.i].toFixed(1)}h</span></div>
         </div>
       )}
     </div>
@@ -165,15 +165,15 @@ export function DivergingBars({ items, format = (v: number) => `${v > 0 ? "+" : 
         {items.map((it, k) => {
           const pct = (Math.abs(it.value) / max) * 50;
           const pos = it.value >= 0;
-          const c = it.color ?? (pos ? "#fb7185" : "#34d399");
+          const c = it.color ?? (pos ? "#D64545" : "#1F9D6B");
           return (
             <motion.div key={it.key} layout initial={{ opacity: 0, x: -8 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: k * 0.03 }}
               className="grid grid-cols-[minmax(0,1fr)_minmax(0,1.3fr)_52px] items-center gap-3" style={{ height }}>
-              <div className={`truncate text-[12px] ${it.muted ? "text-slate-500" : "text-slate-300"}`}>{it.label}</div>
+              <div className={`truncate text-[12px] ${it.muted ? "text-stone-500" : "text-stone-700"}`}>{it.label}</div>
               <div className="relative h-full">
-                <div className="absolute inset-y-1 left-1/2 w-px bg-white/10" />
+                <div className="absolute inset-y-1 left-1/2 w-px bg-stone-200" />
                 <motion.div className="absolute inset-y-[5px] rounded-md" initial={{ width: 0 }} animate={{ width: `${pct}%` }} transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
-                  style={{ left: pos ? "50%" : undefined, right: pos ? undefined : "50%", background: `linear-gradient(${pos ? 90 : 270}deg, ${c}55, ${c})`, boxShadow: `0 0 12px ${c}44` }} />
+                  style={{ left: pos ? "50%" : undefined, right: pos ? undefined : "50%", background: c, opacity: 0.85 }} />
               </div>
               <div className="num text-right text-[12px]" style={{ color: c }}>{format(it.value)}</div>
             </motion.div>
@@ -199,15 +199,15 @@ export function Histogram({ start, step, counts, markers, height = 150, truth }:
       <svg width={w} height={height}>
         <defs>
           <linearGradient id="histg" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="0%" stopColor="#67e8f9" />
-            <stop offset="100%" stopColor="#8b5cf6" stopOpacity={0.3} />
+            <stop offset="0%" stopColor="#2952CC" />
+            <stop offset="100%" stopColor="#7C5CC4" stopOpacity={0.3} />
           </linearGradient>
         </defs>
         {counts.map((c, i) => {
           const xv = start + i * step;
           if (xv < lo || xv > hi) return null;
           return (
-            <motion.rect key={i} x={x(xv) + 1} width={bw} rx={2} fill="url(#histg)"
+            <motion.rect key={i} x={x(xv) + 1} width={bw} rx={2} fill="#2952CC" fillOpacity={0.75}
               initial={{ y: height - m.b, height: 0 }} animate={{ y: y(c), height: height - m.b - y(c) }} transition={{ duration: 0.7, delay: i * 0.008, ease: [0.22, 1, 0.36, 1] }} />
           );
         })}
@@ -218,13 +218,13 @@ export function Histogram({ start, step, counts, markers, height = 150, truth }:
         {markers.map((mk, i) => (
           <g key={mk.label}>
             <motion.line initial={{ opacity: 0 }} animate={{ opacity: 1, x1: x(mk.x), x2: x(mk.x) }} y1={m.t - 4} y2={height - m.b} stroke={mk.color} strokeWidth={1.3} strokeDasharray="3 3" />
-            <motion.text animate={{ x: x(mk.x) }} y={m.t - 7 + (i % 2) * 0} textAnchor="middle" fontSize={9.5} fill={mk.color} fontWeight={600}>{mk.label}</motion.text>
+            <motion.text animate={{ x: x(mk.x) + (i > 0 && Math.abs(x(mk.x) - x(markers[0].x)) < 44 ? (mk.x >= markers[0].x ? 22 : -22) : 0) }} y={m.t - 7} textAnchor="middle" fontSize={9.5} fill={mk.color} fontWeight={600}>{mk.label}</motion.text>
           </g>
         ))}
         {truth != null && (
           <motion.g initial={{ opacity: 0, y: -6 }} animate={{ opacity: 1, y: 0 }}>
-            <line x1={x(truth)} x2={x(truth)} y1={m.t} y2={height - m.b} stroke="#fff" strokeWidth={2} />
-            <circle cx={x(truth)} cy={m.t} r={3.5} fill="#fff" />
+            <line x1={x(truth)} x2={x(truth)} y1={m.t} y2={height - m.b} stroke="#1C1917" strokeWidth={2} />
+            <circle cx={x(truth)} cy={m.t} r={3.5} fill="#1C1917" />
           </motion.g>
         )}
       </svg>
@@ -232,19 +232,19 @@ export function Histogram({ start, step, counts, markers, height = 150, truth }:
   );
 }
 
-export function Bars({ items, max, format = (v: number) => v.toFixed(0), color = "#22d3ee" }: { items: { key: string; label: ReactNode; value: number; color?: string; sub?: ReactNode }[]; max?: number; format?: (v: number) => string; color?: string }) {
+export function Bars({ items, max, format = (v: number) => v.toFixed(0), color = "#2952CC" }: { items: { key: string; label: ReactNode; value: number; color?: string; sub?: ReactNode }[]; max?: number; format?: (v: number) => string; color?: string }) {
   const mx = max ?? Math.max(...items.map((i) => i.value), 1);
   return (
     <div className="space-y-2.5">
       {items.map((it, k) => (
         <div key={it.key}>
           <div className="mb-1 flex items-baseline justify-between text-[12px]">
-            <span className="text-slate-300">{it.label}</span>
-            <span className="num text-slate-400">{format(it.value)}{it.sub}</span>
+            <span className="text-stone-700">{it.label}</span>
+            <span className="num text-stone-500">{format(it.value)}{it.sub}</span>
           </div>
-          <div className="h-1.5 overflow-hidden rounded-full bg-white/[0.06]">
+          <div className="h-1.5 overflow-hidden rounded-full bg-stone-100">
             <motion.div className="h-full rounded-full" initial={{ width: 0 }} animate={{ width: `${(it.value / mx) * 100}%` }} transition={{ duration: 0.9, delay: k * 0.05, ease: [0.22, 1, 0.36, 1] }}
-              style={{ background: `linear-gradient(90deg, ${(it.color ?? color)}66, ${it.color ?? color})`, boxShadow: `0 0 10px ${(it.color ?? color)}55` }} />
+              style={{ background: it.color ?? color }} />
           </div>
         </div>
       ))}
@@ -267,9 +267,9 @@ export function Scatter({ points, height = 260, xLabel, yLabel, identity = true,
           </g>
         ))}
         {x.ticks(6).map((t) => <text key={t} x={x(t)} y={height - m.b + 16} textAnchor="middle" fontSize={10} fill={AX} className="num">{t}</text>)}
-        <text x={(m.l + w - m.r) / 2} y={height - 4} textAnchor="middle" fontSize={10.5} fill="rgba(148,163,184,.8)">{xLabel}</text>
-        <text transform={`translate(11 ${(m.t + height - m.b) / 2}) rotate(-90)`} textAnchor="middle" fontSize={10.5} fill="rgba(148,163,184,.8)">{yLabel}</text>
-        {identity && <line x1={x(0)} y1={y(0)} x2={x(x.domain()[1])} y2={y(x.domain()[1])} stroke="rgba(226,232,240,.35)" strokeDasharray="4 5" />}
+        <text x={(m.l + w - m.r) / 2} y={height - 4} textAnchor="middle" fontSize={10.5} fill="rgba(87,83,78,.8)">{xLabel}</text>
+        <text transform={`translate(11 ${(m.t + height - m.b) / 2}) rotate(-90)`} textAnchor="middle" fontSize={10.5} fill="rgba(87,83,78,.8)">{yLabel}</text>
+        {identity && <line x1={x(0)} y1={y(0)} x2={x(x.domain()[1])} y2={y(x.domain()[1])} stroke="rgba(28,25,23,.35)" strokeDasharray="4 5" />}
         {points.filter((p) => p.x <= x.domain()[1]).map((p, i) => (
           <motion.circle key={p.key} cx={x(p.x)} cy={y(p.y)} r={3.2} fill={colorOf(p.group)} fillOpacity={0.7} stroke={colorOf(p.group)}
             initial={{ scale: 0 }} animate={{ scale: 1 }} transition={{ delay: 0.2 + i * 0.002 }} />

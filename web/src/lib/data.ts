@@ -173,8 +173,8 @@ export function fmtH(h: number | null | undefined, sign = true) {
   return `${s}${a.toFixed(0)}h`;
 }
 
-export const riskColor = (p: number) => (p >= 0.6 ? "#fb7185" : p >= 0.3 ? "#fbbf24" : "#34d399");
-export const delayColor = (h: number) => (h > 72 ? "#fb7185" : h > 24 ? "#fbbf24" : "#34d399");
+export const riskColor = (p: number) => (p >= 0.6 ? "#D64545" : p >= 0.3 ? "#C98200" : "#1F9D6B");
+export const delayColor = (h: number) => (h > 72 ? "#D64545" : h > 24 ? "#C98200" : "#1F9D6B");
 
 export const CAUSE_LABELS: Record<string, string> = {
   rolled_over: "Rolled to next sailing",
@@ -192,13 +192,13 @@ export const CAUSE_LABELS: Record<string, string> = {
 };
 
 export const LANE_COLORS: Record<string, string> = {
-  "SHA-RTM": "#22d3ee",
-  "YTN-LAX": "#a78bfa",
-  "PUS-LAX": "#f472b6",
-  "NSA-HAM": "#34d399",
-  "MAA-RTM": "#fbbf24",
-  "SGN-RTM": "#60a5fa",
-  "SIN-NYC": "#fb923c",
-  "NSA-JEA": "#2dd4bf",
-  "NSA-NYC": "#e879f9",
+  "SHA-RTM": "#2952CC",
+  "YTN-LAX": "#7C5CC4",
+  "PUS-LAX": "#C2477A",
+  "NSA-HAM": "#1F8A5E",
+  "MAA-RTM": "#B7791F",
+  "SGN-RTM": "#3E7CB1",
+  "SIN-NYC": "#D0602A",
+  "NSA-JEA": "#2A9D8F",
+  "NSA-NYC": "#9C4DB0",
 };

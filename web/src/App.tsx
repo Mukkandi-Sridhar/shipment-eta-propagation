@@ -49,24 +49,22 @@ export default function App() {
   return (
     <div className="relative min-h-screen">
       <div className="backdrop" />
-      <header className="sticky top-0 z-40 border-b border-white/5 bg-ink-950/70 backdrop-blur-xl">
-        <div className="mx-auto flex max-w-[1680px] items-center gap-4 px-4 py-3 md:px-6">
-          <div className="flex items-center gap-3">
-            <div className="relative grid h-9 w-9 place-items-center rounded-xl bg-gradient-to-br from-cyan-300 to-violet-500 shadow-[0_0_24px_rgba(34,211,238,.45)]">
-              <svg viewBox="0 0 24 24" className="h-5 w-5" fill="none" stroke="#04060c" strokeWidth={2.4} strokeLinecap="round"><path d="M4 15c3-6 13-6 16 0" /><circle cx="12" cy="15" r="2.2" fill="#04060c" /></svg>
-            </div>
-            <div className="leading-tight">
-              <div className="text-[15px] font-semibold tracking-tight text-white">Aiqon <span className="hidden font-normal text-slate-400 sm:inline">ETA Intelligence</span></div>
-              <div className="hidden text-[10.5px] text-slate-500 sm:block">Delay prediction & propagation</div>
-            </div>
+      <header className="sticky top-0 z-40 border-b border-stone-200 bg-[#F7F6F2]/95">
+        <div className="mx-auto flex max-w-[1680px] items-end gap-6 px-4 md:px-6">
+          <div className="flex items-center gap-2.5 py-3.5">
+            <svg viewBox="0 0 24 24" className="h-6 w-6" fill="none" aria-hidden>
+              <rect x="1" y="1" width="22" height="22" rx="5" fill="#1C1917" />
+              <path d="M5.5 15.5h4l2-4 2 6 2-4h3" stroke="#F7F6F2" strokeWidth={1.8} strokeLinecap="round" strokeLinejoin="round" />
+            </svg>
+            <div className="text-[15px] font-semibold tracking-tight text-stone-900">Aiqon <span className="hidden font-normal text-stone-500 sm:inline">/ ETA &amp; delay propagation</span></div>
           </div>
-          <nav className="ml-auto flex gap-1 overflow-x-auto rounded-2xl [scrollbar-width:none] border border-white/5 bg-white/[0.02] p-1" aria-label="Sections">
+          <nav className="ml-auto flex gap-1 overflow-x-auto [scrollbar-width:none]" aria-label="Sections">
             {TABS.map((t) => (
               <button key={t.key} onClick={() => setTab(t.key)} aria-current={tab === t.key ? "page" : undefined}
-                className={`relative flex shrink-0 items-center gap-2 rounded-xl px-3 py-2 text-[12.5px] font-medium transition-colors ${tab === t.key ? "text-white" : "text-slate-400 hover:text-slate-200"}`}>
-                {tab === t.key && <motion.span layoutId="tab" className="absolute inset-0 rounded-xl border border-cyan-300/25 bg-cyan-300/10 shadow-[0_0_24px_-6px_rgba(34,211,238,.5)]" transition={{ type: "spring", stiffness: 420, damping: 36 }} />}
-                <t.icon size={14} className="relative" />
-                <span className="relative hidden lg:inline">{t.label}</span>
+                className={`relative flex shrink-0 items-center gap-2 px-3 pb-3.5 pt-3 text-[13px] font-medium transition-colors ${tab === t.key ? "text-stone-900" : "text-stone-500 hover:text-stone-800"}`}>
+                <t.icon size={15} className="lg:hidden" />
+                <span className="hidden lg:inline">{t.label}</span>
+                {tab === t.key && <motion.span layoutId="tab" className="absolute inset-x-2 -bottom-px h-0.5 rounded-full bg-stone-900" transition={{ type: "spring", stiffness: 420, damping: 36 }} />}
               </button>
             ))}
           </nav>
@@ -74,11 +72,11 @@ export default function App() {
       </header>
 
       <main className="relative z-10 mx-auto max-w-[1680px] px-4 py-6 md:px-6">
-        {error && <div className="rounded-2xl border border-bad/30 bg-bad/10 p-5 text-sm text-bad">Could not load dashboard data ({error}). Run <code>python -m eta.run</code> first.</div>}
+        {error && <div className="rounded-xl border border-bad/30 bg-bad/5 p-5 text-sm text-bad">Could not load dashboard data ({error}). Run <code>python -m eta.run</code> first.</div>}
         {!data && !error && <Loader />}
         {data && (
           <AnimatePresence mode="wait">
-            <motion.div key={tab} initial={{ opacity: 0, y: 10, filter: "blur(4px)" }} animate={{ opacity: 1, y: 0, filter: "blur(0px)" }} exit={{ opacity: 0, y: -6, filter: "blur(4px)" }} transition={{ duration: 0.35, ease: [0.22, 1, 0.36, 1] }}>
+            <motion.div key={tab} initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.18 }}>
               {tab === "overview" && <Overview data={data} onOpen={open} />}
               {tab === "shipment" && id && <ShipmentView data={data} id={id} setId={setId} />}
               {tab === "propagation" && <Propagation data={data} />}
@@ -87,7 +85,7 @@ export default function App() {
             </motion.div>
           </AnimatePresence>
         )}
-        <footer className="mt-10 flex flex-wrap items-center justify-between gap-2 border-t border-white/5 pt-5 text-[11px] text-slate-600">
+        <footer className="mt-10 flex flex-wrap items-center justify-between gap-2 border-t border-stone-200 pt-5 text-[11px] text-stone-400">
           <span>Sridhar Mukkandi · Aiqon AI Internship take-home</span>
           <span>Synthetic data · stage-chain gradient boosting · Monte-Carlo ETA · TreeSHAP</span>
         </footer>
@@ -100,11 +98,8 @@ function Loader() {
   return (
     <div className="grid h-[70vh] place-items-center">
       <div className="flex flex-col items-center gap-4">
-        <div className="relative h-14 w-14">
-          <motion.div className="absolute inset-0 rounded-full border-2 border-cyan-300/20 border-t-cyan-300" animate={{ rotate: 360 }} transition={{ repeat: Infinity, duration: 1, ease: "linear" }} />
-          <motion.div className="absolute inset-2 rounded-full border-2 border-violet-400/20 border-b-violet-400" animate={{ rotate: -360 }} transition={{ repeat: Infinity, duration: 1.6, ease: "linear" }} />
-        </div>
-        <div className="text-xs uppercase tracking-[0.2em] text-slate-500">Loading forecasts</div>
+        <motion.div className="h-8 w-8 rounded-full border-2 border-stone-200 border-t-stone-800" animate={{ rotate: 360 }} transition={{ repeat: Infinity, duration: 0.9, ease: "linear" }} />
+        <div className="text-[13px] text-stone-500">Loading forecasts…</div>
       </div>
     </div>
   );

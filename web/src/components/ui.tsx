@@ -4,10 +4,10 @@ import { ReactNode, useEffect, useRef, useState } from "react";
 export function Card({ children, className = "", delay = 0, glow = false }: { children: ReactNode; className?: string; delay?: number; glow?: boolean }) {
   return (
     <motion.div
-      initial={{ opacity: 0, y: 14 }}
+      initial={{ opacity: 0, y: 6 }}
       animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.55, delay, ease: [0.22, 1, 0.36, 1] }}
-      className={`glass glass-hover relative rounded-2xl ${glow ? "shadow-glow" : ""} ${className}`}
+      transition={{ duration: 0.4, delay: delay * 0.6, ease: [0.22, 1, 0.36, 1] }}
+      className={`glass glass-hover relative rounded-xl ${glow ? "ring-1 ring-accent-200" : ""} ${className}`}
     >
       {children}
     </motion.div>
@@ -18,8 +18,8 @@ export function CardHeader({ title, kicker, right, info }: { title: ReactNode; k
   return (
     <div className="flex items-start justify-between gap-3 px-5 pt-4">
       <div className="min-w-0">
-        {kicker && <div className="mb-1 text-[10px] font-semibold uppercase tracking-[0.18em] text-cyan-300/70">{kicker}</div>}
-        <div className="flex items-center gap-2 text-[15px] font-semibold text-slate-100">
+        {kicker && <div className="mb-0.5 text-[11.5px] text-stone-500">{kicker}</div>}
+        <div className="flex items-center gap-2 text-[15px] font-semibold text-stone-900">
           {title}
           {info && <InfoTip text={info} />}
         </div>
@@ -34,10 +34,10 @@ export function InfoTip({ text }: { text: string }) {
   return (
     <span className="relative inline-flex" onMouseEnter={() => setOpen(true)} onMouseLeave={() => setOpen(false)}>
       <button aria-label="More info" onFocus={() => setOpen(true)} onBlur={() => setOpen(false)}
-        className="grid h-4 w-4 place-items-center rounded-full border border-white/15 text-[9px] font-bold text-slate-400 hover:text-cyan-300">i</button>
+        className="grid h-4 w-4 place-items-center rounded-full border border-stone-300 text-[9px] font-semibold text-stone-400 hover:border-accent-300 hover:text-accent-600">i</button>
       {open && (
         <motion.span initial={{ opacity: 0, y: 4 }} animate={{ opacity: 1, y: 0 }}
-          className="absolute left-1/2 top-6 z-50 w-64 -translate-x-1/2 rounded-xl border border-white/10 bg-ink-850/95 p-3 text-xs font-normal leading-relaxed text-slate-300 shadow-2xl backdrop-blur">
+          className="absolute left-1/2 top-6 z-50 w-64 -translate-x-1/2 rounded-lg border border-stone-200 bg-white p-3 text-xs font-normal leading-relaxed text-stone-700 shadow-lg">
           {text}
         </motion.span>
       )}
@@ -61,27 +61,27 @@ export function CountUp({ value, decimals = 0, prefix = "", suffix = "", classNa
   return <motion.span ref={ref} className={`num ${className}`}>{text}</motion.span>;
 }
 
-export function Pill({ children, color = "#67e8f9", className = "" }: { children: ReactNode; color?: string; className?: string }) {
+export function Pill({ children, color = "#2952CC", className = "" }: { children: ReactNode; color?: string; className?: string }) {
   return (
-    <span className={`inline-flex items-center gap-1.5 rounded-full border px-2 py-0.5 text-[11px] font-medium ${className}`}
-      style={{ borderColor: `${color}40`, background: `${color}14`, color }}>
+    <span className={`inline-flex items-center gap-1.5 rounded-md border px-1.5 py-0.5 text-[11px] font-medium ${className}`}
+      style={{ borderColor: `${color}33`, background: `${color}0f`, color }}>
       {children}
     </span>
   );
 }
 
 export function Dot({ color, pulse = false }: { color: string; pulse?: boolean }) {
-  return <span className={`inline-block h-1.5 w-1.5 rounded-full ${pulse ? "pulse-dot" : ""}`} style={{ background: color, boxShadow: `0 0 8px ${color}` }} />;
+  return <span className={`inline-block h-1.5 w-1.5 rounded-full ${pulse ? "pulse-dot" : ""}`} style={{ background: color }} />;
 }
 
 export function Segmented<T extends string | number>({ options, value, onChange, size = "md" }: { options: { value: T; label: ReactNode }[]; value: T; onChange: (v: T) => void; size?: "sm" | "md" }) {
   const id = useRef(`seg-${Math.random().toString(36).slice(2)}`).current;
   return (
-    <div className="inline-flex rounded-xl border border-white/10 bg-white/[0.03] p-1">
+    <div className="inline-flex rounded-lg border border-stone-200 bg-stone-100/70 p-0.5">
       {options.map((o) => (
         <button key={String(o.value)} onClick={() => onChange(o.value)}
-          className={`relative rounded-lg ${size === "sm" ? "px-2.5 py-1 text-[11px]" : "px-3.5 py-1.5 text-xs"} font-medium transition-colors ${value === o.value ? "text-ink-950" : "text-slate-400 hover:text-slate-200"}`}>
-          {value === o.value && <motion.span layoutId={id} className="absolute inset-0 rounded-lg bg-cyan-300" transition={{ type: "spring", stiffness: 500, damping: 38 }} />}
+          className={`relative rounded-md ${size === "sm" ? "px-2.5 py-1 text-[11px]" : "px-3.5 py-1.5 text-xs"} font-medium transition-colors ${value === o.value ? "text-stone-900" : "text-stone-500 hover:text-stone-800"}`}>
+          {value === o.value && <motion.span layoutId={id} className="absolute inset-0 rounded-md border border-stone-200 bg-white shadow-sm" transition={{ type: "spring", stiffness: 500, damping: 38 }} />}
           <span className="relative">{o.label}</span>
         </button>
       ))}
@@ -92,72 +92,43 @@ export function Segmented<T extends string | number>({ options, value, onChange,
 export function Gauge({ value, size = 132, label = "P(late)" }: { value: number; size?: number; label?: string }) {
   const r = size / 2 - 12;
   const c = Math.PI * r; // half circle
-  const color = value >= 0.6 ? "#fb7185" : value >= 0.3 ? "#fbbf24" : "#34d399";
+  const color = value >= 0.6 ? "#D64545" : value >= 0.3 ? "#C98200" : "#1F9D6B";
   return (
     <div className="relative" style={{ width: size, height: size / 2 + 20 }}>
       <svg width={size} height={size / 2 + 12} viewBox={`0 0 ${size} ${size / 2 + 12}`}>
-        <defs>
-          <linearGradient id="gaugeg" x1="0" x2="1">
-            <stop offset="0%" stopColor="#34d399" />
-            <stop offset="50%" stopColor="#fbbf24" />
-            <stop offset="100%" stopColor="#fb7185" />
-          </linearGradient>
-        </defs>
-        <path d={`M12 ${size / 2} A ${r} ${r} 0 0 1 ${size - 12} ${size / 2}`} fill="none" stroke="rgba(255,255,255,.08)" strokeWidth={10} strokeLinecap="round" />
-        <motion.path d={`M12 ${size / 2} A ${r} ${r} 0 0 1 ${size - 12} ${size / 2}`} fill="none" stroke="url(#gaugeg)" strokeWidth={10} strokeLinecap="round"
-          strokeDasharray={c} initial={{ strokeDashoffset: c }} animate={{ strokeDashoffset: c * (1 - value) }} transition={{ duration: 1, ease: [0.22, 1, 0.36, 1] }}
-          style={{ filter: `drop-shadow(0 0 6px ${color}88)` }} />
+        <path d={`M12 ${size / 2} A ${r} ${r} 0 0 1 ${size - 12} ${size / 2}`} fill="none" stroke="#EEECE7" strokeWidth={10} strokeLinecap="round" />
+        <motion.path d={`M12 ${size / 2} A ${r} ${r} 0 0 1 ${size - 12} ${size / 2}`} fill="none" stroke={color} strokeWidth={10} strokeLinecap="round"
+          strokeDasharray={c} initial={{ strokeDashoffset: c }} animate={{ strokeDashoffset: c * (1 - value) }} transition={{ duration: 1, ease: [0.22, 1, 0.36, 1] }} />
       </svg>
       <div className="absolute inset-x-0 bottom-0 text-center">
         <div className="num text-2xl font-semibold" style={{ color }}><CountUp value={value * 100} suffix="%" /></div>
-        <div className="text-[10px] uppercase tracking-widest text-slate-500">{label}</div>
+        <div className="text-[11px] text-stone-500">{label}</div>
       </div>
     </div>
   );
 }
 
-export function Typewriter({ lines, speed = 12 }: { lines: string[]; speed?: number }) {
-  const [shown, setShown] = useState(0);
-  const total = lines.join("\u0000").length;
-  useEffect(() => {
-    setShown(0);
-    let i = 0;
-    const t = setInterval(() => {
-      i += 3;
-      setShown(i);
-      if (i >= total) clearInterval(t);
-    }, speed);
-    return () => clearInterval(t);
-  }, [lines.join("|")]);
-  let left = shown;
+/** Briefing lines; they appear one after another. */
+export function Narrative({ lines }: { lines: string[] }) {
   return (
-    <div className="space-y-2.5">
-      {lines.map((l, k) => {
-        const part = l.slice(0, Math.max(0, left));
-        left -= l.length + 1;
-        if (!part) return null;
-        const typing = part.length < l.length;
-        return (
-          <div key={k} className="flex gap-2.5 text-[13px] leading-relaxed text-slate-300">
-            <span className="mt-[7px] h-1 w-1 shrink-0 rounded-full bg-cyan-300/80" />
-            <span>
-              {part}
-              {typing && <span className="ml-0.5 inline-block h-3.5 w-1.5 translate-y-0.5 bg-cyan-300/80 pulse-dot" />}
-            </span>
-          </div>
-        );
-      })}
-    </div>
+    <ol className="space-y-2.5">
+      {lines.map((l, k) => (
+        <motion.li key={l} initial={{ opacity: 0, x: -4 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: k * 0.12, duration: 0.3 }}
+          className="grid grid-cols-[18px_1fr] text-[13.5px] leading-relaxed text-stone-700">
+          <span className="num pt-[3px] text-[11px] text-stone-400">{k + 1}</span>
+          <span>{l}</span>
+        </motion.li>
+      ))}
+    </ol>
   );
 }
 
-export function Stat({ label, value, sub, accent = "#67e8f9", delay = 0, info }: { label: string; value: ReactNode; sub?: ReactNode; accent?: string; delay?: number; info?: string }) {
+export function Stat({ label, value, sub, accent = "#2952CC", delay = 0, info }: { label: string; value: ReactNode; sub?: ReactNode; accent?: string; delay?: number; info?: string }) {
   return (
-    <Card delay={delay} className="overflow-hidden p-4">
-      <div className="absolute -right-10 -top-10 h-28 w-28 rounded-full opacity-25 blur-2xl" style={{ background: accent }} />
-      <div className="flex items-center gap-1.5 text-[10px] font-semibold uppercase tracking-[0.16em] text-slate-500">{label}{info && <InfoTip text={info} />}</div>
-      <div className="mt-2 text-[28px] font-semibold leading-none text-slate-50">{value}</div>
-      {sub && <div className="mt-2 text-xs text-slate-400">{sub}</div>}
+    <Card delay={delay} className="p-4">
+      <div className="flex items-center gap-1.5 text-[12px] text-stone-500"><span className="h-2 w-2 rounded-sm" style={{ background: accent }} />{label}{info && <InfoTip text={info} />}</div>
+      <div className="num mt-2.5 text-[28px] font-medium leading-none text-stone-900">{value}</div>
+      {sub && <div className="mt-2 text-xs text-stone-500">{sub}</div>}
     </Card>
   );
 }

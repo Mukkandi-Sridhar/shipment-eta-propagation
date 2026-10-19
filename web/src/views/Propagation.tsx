@@ -7,7 +7,7 @@ import type { AppData } from "../lib/data";
 import { LANE_COLORS, STAGE_KEYS, STAGE_LABELS } from "../lib/data";
 
 const rnd = (a: number, b: number) => { const x = Math.sin(a * 12.9898 + b * 78.233) * 43758.5453; return x - Math.floor(x); };
-const STAGE_COL = ["#60a5fa", "#22d3ee", "#a78bfa", "#f472b6", "#fbbf24"];
+const STAGE_COL = ["#5B8DB8", "#2952CC", "#7C5CC4", "#C2477A", "#C98200"];
 
 export default function Propagation({ data }: { data: AppData }) {
   const A = data.summary.analyses;
@@ -28,10 +28,10 @@ export default function Propagation({ data }: { data: AppData }) {
             info="Each curve takes one real test shipment per lane, injects a departure delay (x) and re-runs the full stage chain. Above the dashed y = x line, delay is amplified downstream (missed connections, berth windows, cut-offs); below it, slack and speed recovery absorb it." />
           <div className="p-4 pt-2">
             <LineChart series={series} identity height={320} xLabel="Departure delay injected (h)" yLabel="Predicted delivery delay (h)" yFormat={(v) => `${v}`} highlight={hl} onHover={setHl} />
-            <div className="mt-3 grid gap-2 text-[11.5px] text-slate-400 md:grid-cols-3">
-              <Insight color="#fb7185" title="Amplification">Transshipment lanes jump once lateness eats the hub buffer, because the box waits for the next connecting sailing.</Insight>
-              <Insight color="#34d399" title="Absorption">On long direct lanes, carriers steam faster and win back part of a small delay before arrival.</Insight>
-              <Insight color="#fbbf24" title="Step effects">Late arrivals miss berth windows, weekend customs closures and fixed-day rail ramps, so the curves rise in steps rather than straight lines.</Insight>
+            <div className="mt-3 grid gap-2 text-[11.5px] text-stone-500 md:grid-cols-3">
+              <Insight color="#D64545" title="Amplification">Transshipment lanes jump once lateness eats the hub buffer, because the box waits for the next connecting sailing.</Insight>
+              <Insight color="#1F9D6B" title="Absorption">On long direct lanes, carriers steam faster and win back part of a small delay before arrival.</Insight>
+              <Insight color="#C98200" title="Step effects">Late arrivals miss berth windows, weekend customs closures and fixed-day rail ramps, so the curves rise in steps rather than straight lines.</Insight>
             </div>
           </div>
         </Card>
@@ -40,8 +40,8 @@ export default function Propagation({ data }: { data: AppData }) {
           <div className="p-4 pt-2">
             <Scatter points={A.propagation_empirical.map((p, i) => ({ x: p.dep_late, y: p.final, key: String(i), group: p.lane_id }))} colorOf={(g) => LANE_COLORS[g]} height={320}
               xLabel="Departure lateness (h)" yLabel="Delivery delay (h)" />
-            <div className="mt-2 text-[11px] leading-relaxed text-slate-500">
-              The vertical spread at x ≈ 0 is the core point: most door-to-door delay is created <span className="text-slate-300">after</span> the vessel leaves, at the port, in customs and on the last mile. A model that only carries forward vessel lateness misses it.
+            <div className="mt-2 text-[11px] leading-relaxed text-stone-500">
+              The vertical spread at x ≈ 0 is the core point: most door-to-door delay is created <span className="text-stone-700">after</span> the vessel leaves, at the port, in customs and on the last mile. A model that only carries forward vessel lateness misses it.
             </div>
           </div>
         </Card>
@@ -53,7 +53,7 @@ export default function Propagation({ data }: { data: AppData }) {
             info="Port-stage model response with the other inputs held at their median. Being late hurts far more in a congested port: the vessel loses its berth window and queues behind on-time calls, a queue that grows like u/(1−u)." />
           <div className="p-4 pt-2">
             <Heatmap {...(A.port_surface as any)} xLabel={A.port_surface.x_label} yLabel={A.port_surface.y_label} zLabel={A.port_surface.z_label}
-              scheme={d3.interpolateMagma} yFmt={(v: number) => `${Math.round(v * 100)}%`} xFmt={(v: number) => `${v}h`} height={300} />
+              scheme={d3.interpolateYlOrRd} yFmt={(v: number) => `${Math.round(v * 100)}%`} xFmt={(v: number) => `${v}h`} height={300} />
           </div>
         </Card>
         <Card className="p-0">
@@ -61,7 +61,7 @@ export default function Propagation({ data }: { data: AppData }) {
             info="Customs-stage model response by the weekday and hour the container becomes available. Releases happen only Mon–Fri, 08–18, so boxes landing on Friday evening wait out the weekend. The model learned this from the data; it was never told the rule." />
           <div className="p-4 pt-2">
             <Heatmap x={A.customs_surface.x as number[]} y={A.customs_surface.y} z={A.customs_surface.z} xLabel={A.customs_surface.x_label} yLabel={A.customs_surface.y_label} zLabel={A.customs_surface.z_label}
-              scheme={d3.interpolateViridis} xFmt={(v: number) => `${String(v).padStart(2, "0")}:00`} height={300} />
+              scheme={d3.interpolatePuBu} xFmt={(v: number) => `${String(v).padStart(2, "0")}:00`} height={300} />
           </div>
         </Card>
       </div>
@@ -79,7 +79,7 @@ export default function Propagation({ data }: { data: AppData }) {
             <tbody>
               {groups.map((g, gi) => (
                 <tr key={g}>
-                  <td className="pr-3 text-right text-slate-400">{g}</td>
+                  <td className="pr-3 text-right text-stone-500">{g}</td>
                   {A.stage_importance.map((s, i) => {
                     const v = s.groups[g];
                     const t = v / maxImp;
@@ -87,7 +87,7 @@ export default function Propagation({ data }: { data: AppData }) {
                       <td key={s.stage} className="p-0">
                         <motion.div initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} transition={{ delay: (gi + i) * 0.015 }}
                           className="num grid h-9 place-items-center rounded-lg text-[11px]"
-                          style={{ background: `rgba(34,211,238,${0.04 + t * 0.7})`, color: t > 0.45 ? "#04060c" : "rgba(226,232,240,.75)", boxShadow: t > 0.5 ? "0 0 18px rgba(34,211,238,.35)" : undefined }}>
+                          style={{ background: `rgba(41,82,204,${0.03 + t * 0.85})`, color: t > 0.45 ? "#FFFFFF" : "rgba(28,25,23,.75)" }}>
                           {v.toFixed(1)}h
                         </motion.div>
                       </td>
@@ -105,7 +105,7 @@ export default function Propagation({ data }: { data: AppData }) {
 
 function Insight({ color, title, children }: { color: string; title: string; children: React.ReactNode }) {
   return (
-    <div className="rounded-xl border border-white/5 bg-white/[0.02] p-3">
+    <div className="rounded-xl border border-stone-200 bg-stone-50 p-3">
       <div className="mb-1 flex items-center gap-1.5 text-[11px] font-semibold" style={{ color }}><span className="h-1.5 w-1.5 rounded-full" style={{ background: color }} />{title}</div>
       <div className="leading-relaxed">{children}</div>
     </div>
@@ -121,8 +121,8 @@ function Cascade({ data }: { data: AppData }) {
   const xs = STAGE_KEYS.map((_, i) => 90 + i * 185);
   return (
     <Card className="overflow-hidden p-0" glow>
-      <CardHeader kicker="The delay cascade" title="Delay is created at every stage and carried downstream"
-        right={<Pill color="#67e8f9">Ground truth · {Math.round(data.summary.dataset.late_rate * 100)}% of shipments late</Pill>}
+      <CardHeader kicker="Ground truth, all late shipments" title="Delay is created at every stage and carried downstream"
+        right={<span className="pt-1 text-[12px] text-stone-500">{Math.round(data.summary.dataset.late_rate * 100)}% of shipments late</span>}
         info="Particles enter at each stage in proportion to the delay hours actually created there, across all late shipments, then ride the chain to delivery. The stream thickens downstream because delay accumulates; that accumulation is what the stage-chain model predicts." />
       <div className="px-2 pb-3">
         <svg viewBox={`0 0 ${W} ${H}`} className="w-full" role="img" aria-label="Animated flow of delay through the five shipment stages">
@@ -139,15 +139,14 @@ function Cascade({ data }: { data: AppData }) {
             const d = `M ${xs[0] - 60} ${H / 2 - 3} ` + xs.map((x, i) => `L ${x} ${top(i)}`).join(" ") + ` L ${W - 20} ${top(4)} L ${W - 20} ${bot(4)} ` + xs.slice().reverse().map((x, ri) => `L ${x} ${bot(4 - ri)}`).join(" ") + ` L ${xs[0] - 60} ${H / 2 + 3} Z`;
             return (
               <>
-                <path d={d} fill="url(#river)" opacity={0.18} filter="url(#blur)" />
-                <path d={d} fill="url(#river)" opacity={0.22} />
+                                <path d={d} fill="url(#river)" opacity={0.16} />
                 {STAGE_KEYS.map((k, i) => {
                   const n = Math.max(2, Math.round((share[k] / tot) * 26));
                   return Array.from({ length: n }).map((_, p) => {
                     const yOff = (rnd(i * 31 + p, 1) - 0.5) * widths[4] * 0.8;
                     const dur = 3.2 + rnd(i * 31 + p, 2) * 1.6;
                     return (
-                      <motion.circle key={`${k}-${p}`} r={2.2} fill={STAGE_COL[i]} style={{ filter: `drop-shadow(0 0 4px ${STAGE_COL[i]})` }}
+                      <motion.circle key={`${k}-${p}`} r={2.2} fill={STAGE_COL[i]} style={{ filter: `none` }}
                         initial={{ cx: xs[i], cy: H / 2 + yOff * (widths[i] / widths[4]), opacity: 0 }}
                         animate={{ cx: [xs[i], W - 20], cy: [H / 2 + yOff * (widths[i] / widths[4]), H / 2 + yOff], opacity: [0, 1, 1, 0] }}
                         transition={{ duration: dur * (1 - i * 0.16), repeat: Infinity, delay: rnd(i * 31 + p, 3) * 3, ease: "linear" }} />
@@ -156,13 +155,13 @@ function Cascade({ data }: { data: AppData }) {
                 })}
                 {STAGE_KEYS.map((k, i) => (
                   <g key={k}>
-                    <circle cx={xs[i]} cy={H / 2} r={20} fill="#04060c" stroke={STAGE_COL[i]} strokeWidth={1.5} />
+                    <circle cx={xs[i]} cy={H / 2} r={20} fill="#FFFFFF" stroke={STAGE_COL[i]} strokeWidth={1.5} />
                     <circle cx={xs[i]} cy={H / 2} r={20} fill={STAGE_COL[i]} opacity={0.12} />
                     <text x={xs[i]} y={H / 2} dy="0.35em" textAnchor="middle" fontSize={12} fontWeight={600} fill={STAGE_COL[i]} className="num">{Math.round((share[k] / tot) * 100)}%</text>
-                    <text x={xs[i]} y={H / 2 - 34} textAnchor="middle" fontSize={12} fill="rgba(226,232,240,.85)">{STAGE_LABELS[i]}</text>
+                    <text x={xs[i]} y={H / 2 - 34} textAnchor="middle" fontSize={12} fill="rgba(28,25,23,.85)">{STAGE_LABELS[i]}</text>
                   </g>
                 ))}
-                <text x={W - 24} y={H / 2 - 34} textAnchor="end" fontSize={12} fill="#fff">Delivery</text>
+                <text x={W - 24} y={H / 2 - 34} textAnchor="end" fontSize={12} fill="#1C1917">Delivery</text>
               </>
             );
           })()}

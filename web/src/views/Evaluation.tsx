@@ -6,7 +6,7 @@ import type { AppData } from "../lib/data";
 import { CHECKPOINT_SHORT, LANE_COLORS } from "../lib/data";
 
 const MODEL_COL: Record<string, string> = {
-  schedule: "#64748b", carry_forward: "#94a3b8", lane_history: "#fbbf24", direct_gbm: "#a78bfa", stage_chain: "#22d3ee",
+  schedule: "#A8A29E", carry_forward: "#8B8680", lane_history: "#C98200", direct_gbm: "#7C5CC4", stage_chain: "#2952CC",
 };
 const ORDER = ["schedule", "carry_forward", "lane_history", "direct_gbm", "stage_chain"];
 
@@ -43,7 +43,7 @@ export default function Evaluation({ data }: { data: AppData }) {
           <div className="overflow-x-auto">
             <table className="w-full text-[12px]">
               <thead>
-                <tr className="text-[10px] uppercase tracking-widest text-slate-500">
+                <tr className="text-[11.5px] text-stone-500">
                   <th className="pb-2 text-left font-medium">Model</th>
                   {CHECKPOINT_SHORT.map((c) => <th key={c} className="pb-2 text-right font-medium">{c}</th>)}
                 </tr>
@@ -55,27 +55,27 @@ export default function Evaluation({ data }: { data: AppData }) {
                     return metric === "within24" ? Math.max(...vals) : Math.min(...vals);
                   };
                   return (
-                    <tr key={m} className={`border-t border-white/5 ${m === "stage_chain" ? "bg-cyan-300/[0.05]" : ""}`}>
-                      <td className="py-2 pr-2"><span className="flex items-center gap-2"><span className="h-2 w-2 rounded-full" style={{ background: MODEL_COL[m] }} /><span className={m === "stage_chain" ? "font-semibold text-cyan-200" : "text-slate-300"}>{S.model_labels[m]}</span></span></td>
+                    <tr key={m} className={`border-t border-stone-200 ${m === "stage_chain" ? "bg-accent-600/[0.05]" : ""}`}>
+                      <td className="py-2 pr-2"><span className="flex items-center gap-2"><span className="h-2 w-2 rounded-full" style={{ background: MODEL_COL[m] }} /><span className={m === "stage_chain" ? "font-semibold text-accent-700" : "text-stone-700"}>{S.model_labels[m]}</span></span></td>
                       {[0, 1, 2, 3, 4].map((c) => {
                         const v = (get(c, m) as any)[metric];
                         const isBest = v === best(c);
-                        return <td key={c} className={`num py-2 text-right ${isBest ? "font-semibold text-ok" : "text-slate-400"}`}>{mFmt(v)}</td>;
+                        return <td key={c} className={`num py-2 text-right ${isBest ? "font-semibold text-ok" : "text-stone-500"}`}>{mFmt(v)}</td>;
                       })}
                     </tr>
                   );
                 })}
               </tbody>
             </table>
-            <div className="mt-4 space-y-1.5 text-[11.5px] text-slate-400">
-              <div className="text-[10px] font-semibold uppercase tracking-widest text-slate-500">Stage-chain MAE gain, 95% bootstrap CI</div>
+            <div className="mt-4 space-y-1.5 text-[11.5px] text-stone-500">
+              <div className="text-[11.5px] text-stone-500">Stage-chain MAE gain, 95% bootstrap CI</div>
               {S.gain_vs_direct.map((g, i) => {
                 const lane = S.gain_vs_lane[i];
                 return (
                   <div key={g.checkpoint} className="grid grid-cols-[72px_1fr_1fr] gap-2">
-                    <span className="text-slate-500">{CHECKPOINT_SHORT[g.checkpoint]}</span>
-                    <span>vs lane <span className={`num ${lane.lo > 0 ? "text-ok" : "text-slate-300"}`}>{lane.gain > 0 ? "+" : ""}{lane.gain.toFixed(1)}h</span> <span className="num text-slate-600">[{lane.lo.toFixed(1)}, {lane.hi.toFixed(1)}]</span></span>
-                    <span>vs GBM <span className={`num ${g.lo > 0 ? "text-ok" : g.hi < 0 ? "text-bad" : "text-slate-300"}`}>{g.gain > 0 ? "+" : ""}{g.gain.toFixed(1)}h</span> <span className="num text-slate-600">[{g.lo.toFixed(1)}, {g.hi.toFixed(1)}]</span></span>
+                    <span className="text-stone-500">{CHECKPOINT_SHORT[g.checkpoint]}</span>
+                    <span>vs lane <span className={`num ${lane.lo > 0 ? "text-ok" : "text-stone-700"}`}>{lane.gain > 0 ? "+" : ""}{lane.gain.toFixed(1)}h</span> <span className="num text-stone-400">[{lane.lo.toFixed(1)}, {lane.hi.toFixed(1)}]</span></span>
+                    <span>vs GBM <span className={`num ${g.lo > 0 ? "text-ok" : g.hi < 0 ? "text-bad" : "text-stone-700"}`}>{g.gain > 0 ? "+" : ""}{g.gain.toFixed(1)}h</span> <span className="num text-stone-400">[{g.lo.toFixed(1)}, {g.hi.toFixed(1)}]</span></span>
                   </div>
                 );
               })}
@@ -92,14 +92,14 @@ export default function Evaluation({ data }: { data: AppData }) {
               const r = get(c, "stage_chain"), d = get(c, "direct_gbm");
               return (
                 <div key={c} className="grid grid-cols-[76px_1fr_1fr_1fr] items-center gap-2 text-[12px]">
-                  <span className="text-slate-500">{CHECKPOINT_SHORT[c]}</span>
+                  <span className="text-stone-500">{CHECKPOINT_SHORT[c]}</span>
                   <Metric label="AUC" v={r.auc!} ref2={d.auc} fmt={(x) => x.toFixed(2)} />
                   <Metric label="Brier" v={r.brier!} ref2={d.brier} fmt={(x) => x.toFixed(3)} lowerBetter />
                   <Metric label="Cover" v={r.coverage80!} fmt={(x) => `${Math.round(x * 100)}%`} />
                 </div>
               );
             })}
-            <div className="text-[10.5px] text-slate-500">Small grey numbers = Direct GBM classifier. Coverage above 80% means the intervals are conservative; see the limitations in the report.</div>
+            <div className="text-[10.5px] text-stone-500">Small grey numbers = Direct GBM classifier. Coverage above 80% means the intervals are conservative; see the limitations in the report.</div>
           </div>
         </Card>
         <Card className="p-0">
@@ -111,15 +111,15 @@ export default function Evaluation({ data }: { data: AppData }) {
           <div className="space-y-3 p-5 pt-4">
             {S.attribution.map((a, i) => (
               <div key={a.checkpoint}>
-                <div className="mb-1 flex justify-between text-[11.5px]"><span className="text-slate-400">{CHECKPOINT_SHORT[a.checkpoint]} <span className="text-slate-600">n={a.n}</span></span><span className="num font-semibold text-cyan-200">{Math.round(a.model * 100)}%</span></div>
-                <div className="relative h-2 rounded-full bg-white/5">
-                  <motion.div className="absolute inset-y-0 left-0 rounded-full bg-gradient-to-r from-cyan-500 to-cyan-300" initial={{ width: 0 }} animate={{ width: `${a.model * 100}%` }} transition={{ duration: 0.9, delay: i * 0.08 }} />
-                  <div className="absolute -top-0.5 h-3 w-0.5 rounded bg-amber-300" style={{ left: `${a.lane_baseline * 100}%` }} title="lane history" />
-                  <div className="absolute -top-0.5 h-3 w-0.5 rounded bg-slate-400" style={{ left: `${a.chance * 100}%` }} title="chance" />
+                <div className="mb-1 flex justify-between text-[11.5px]"><span className="text-stone-500">{CHECKPOINT_SHORT[a.checkpoint]} <span className="text-stone-400">n={a.n}</span></span><span className="num font-semibold text-accent-700">{Math.round(a.model * 100)}%</span></div>
+                <div className="relative h-2 rounded-full bg-stone-100">
+                  <motion.div className="absolute inset-y-0 left-0 rounded-full bg-gradient-to-r from-accent-700 to-accent-500" initial={{ width: 0 }} animate={{ width: `${a.model * 100}%` }} transition={{ duration: 0.9, delay: i * 0.08 }} />
+                  <div className="absolute -top-0.5 h-3 w-0.5 rounded bg-amber-500" style={{ left: `${a.lane_baseline * 100}%` }} title="lane history" />
+                  <div className="absolute -top-0.5 h-3 w-0.5 rounded bg-stone-500" style={{ left: `${a.chance * 100}%` }} title="chance" />
                 </div>
               </div>
             ))}
-            <div className="flex gap-4 text-[10.5px] text-slate-500"><span className="flex items-center gap-1"><span className="h-2.5 w-0.5 bg-amber-300" />lane's historically worst stage</span><span className="flex items-center gap-1"><span className="h-2.5 w-0.5 bg-slate-400" />random</span></div>
+            <div className="flex gap-4 text-[10.5px] text-stone-500"><span className="flex items-center gap-1"><span className="h-2.5 w-0.5 bg-amber-500" />lane's historically worst stage</span><span className="flex items-center gap-1"><span className="h-2.5 w-0.5 bg-stone-500" />random</span></div>
           </div>
         </Card>
       </div>
@@ -134,7 +134,7 @@ export default function Evaluation({ data }: { data: AppData }) {
             info="The whole pipeline is re-run on larger simulated datasets (same generator, different seed) to show how much of the remaining error is a data-volume problem rather than a modelling one." />
           <div className="p-4 pt-2">
             {lc.length ? <LineChart key={lcCp} series={lcSeries} height={240} xTicks={lc.map((r) => Math.log10(r.n))} xFormat={(v) => `${Math.round(10 ** v)}`} yFormat={(v) => `${v.toFixed(0)}h`} xLabel="Shipments simulated" yLabel="MAE (h)" />
-              : <div className="p-6 text-sm text-slate-500">Run <code>python -m eta.run</code> without <code>--fast</code>.</div>}
+              : <div className="p-6 text-sm text-stone-500">Run <code>python -m eta.run</code> without <code>--fast</code>.</div>}
           </div>
         </Card>
         <Card className="p-0">
@@ -144,24 +144,24 @@ export default function Evaluation({ data }: { data: AppData }) {
             {S.per_lane.filter((r) => r.checkpoint === laneCp).sort((a, b) => a.stage_chain - b.stage_chain).map((r) => {
               const mx = Math.max(...S.per_lane.filter((q) => q.checkpoint === laneCp).flatMap((q) => [q.stage_chain, q.lane_history, q.direct_gbm]));
               return (
-                <div key={r.lane_id} className="grid grid-cols-[86px_1fr_44px] items-center gap-2 text-[11px]">
-                  <span className="num flex items-center gap-1.5 text-slate-300"><span className="h-1.5 w-1.5 rounded-full" style={{ background: LANE_COLORS[r.lane_id] }} />{r.lane_id}</span>
+                <div key={r.lane_id} className="grid grid-cols-[86px_1fr_70px] items-center gap-2 text-[11px]">
+                  <span className="num flex items-center gap-1.5 text-stone-700"><span className="h-1.5 w-1.5 rounded-full" style={{ background: LANE_COLORS[r.lane_id] }} />{r.lane_id}</span>
                   <div className="space-y-0.5">
-                    <motion.div className="h-1.5 rounded-full bg-cyan-400" initial={{ width: 0 }} animate={{ width: `${(r.stage_chain / mx) * 100}%` }} />
-                    <motion.div className="h-1 rounded-full bg-amber-300/50" initial={{ width: 0 }} animate={{ width: `${(r.lane_history / mx) * 100}%` }} />
+                    <motion.div className="h-1.5 rounded-full bg-accent-600" initial={{ width: 0 }} animate={{ width: `${(r.stage_chain / mx) * 100}%` }} />
+                    <motion.div className="h-1 rounded-full bg-amber-500/60" initial={{ width: 0 }} animate={{ width: `${(r.lane_history / mx) * 100}%` }} />
                   </div>
-                  <span className="num text-right text-slate-400">{r.stage_chain.toFixed(0)}h <span className="text-slate-600">n{r.n}</span></span>
+                  <span className="num text-right text-stone-500">{r.stage_chain.toFixed(0)}h <span className="text-stone-400">n{r.n}</span></span>
                 </div>
               );
             })}
-            <div className="flex gap-4 pt-1 text-[10.5px] text-slate-500"><span className="flex items-center gap-1"><span className="h-1.5 w-3 rounded bg-cyan-400" />Stage-chain</span><span className="flex items-center gap-1"><span className="h-1 w-3 rounded bg-amber-300/50" />Lane history</span></div>
+            <div className="flex gap-4 pt-1 text-[10.5px] text-stone-500"><span className="flex items-center gap-1"><span className="h-1.5 w-3 rounded bg-accent-600" />Stage-chain</span><span className="flex items-center gap-1"><span className="h-1 w-3 rounded bg-amber-500/60" />Lane history</span></div>
           </div>
         </Card>
       </div>
       <div className="flex flex-wrap gap-2 text-[11px]">
-        <Pill color="#94a3b8">Interval residual scale {S.config.resid_scale}</Pill>
-        <Pill color="#94a3b8">Late threshold {S.config.late_threshold_h}h</Pill>
-        <Pill color="#94a3b8">Seed {S.config.seed}</Pill>
+        <Pill color="#8B8680">Interval residual scale {S.config.resid_scale}</Pill>
+        <Pill color="#8B8680">Late threshold {S.config.late_threshold_h}h</Pill>
+        <Pill color="#8B8680">Seed {S.config.seed}</Pill>
       </div>
     </div>
   );
@@ -170,9 +170,9 @@ export default function Evaluation({ data }: { data: AppData }) {
 function Metric({ label, v, ref2, fmt, lowerBetter = false }: { label: string; v: number; ref2?: number; fmt: (x: number) => string; lowerBetter?: boolean }) {
   const better = ref2 == null ? null : lowerBetter ? v < ref2 : v > ref2;
   return (
-    <div className="rounded-lg border border-white/5 bg-white/[0.02] px-2 py-1">
-      <div className="text-[9px] uppercase tracking-widest text-slate-600">{label}</div>
-      <div className="num text-[12px]"><span className={better ? "text-ok" : "text-slate-200"}>{fmt(v)}</span>{ref2 != null && <span className="ml-1 text-[10px] text-slate-600">{fmt(ref2)}</span>}</div>
+    <div className="rounded-lg border border-stone-200 bg-stone-50 px-2 py-1">
+      <div className="text-[11.5px] text-stone-400">{label}</div>
+      <div className="num text-[12px]"><span className={better ? "text-ok" : "text-stone-800"}>{fmt(v)}</span>{ref2 != null && <span className="ml-1 text-[10px] text-stone-400">{fmt(ref2)}</span>}</div>
     </div>
   );
 }
@@ -188,18 +188,18 @@ function Calibration({ data }: { data: AppData }) {
       <svg viewBox={`0 0 ${W} ${H}`} className="mx-auto h-[240px] w-full">
         {[0, 0.25, 0.5, 0.75, 1].map((t) => (
           <g key={t}>
-            <line x1={sx(0)} x2={sx(1)} y1={sy(t)} y2={sy(t)} stroke="rgba(148,163,184,.08)" />
-            <text x={sx(0) - 6} y={sy(t)} dy="0.32em" textAnchor="end" fontSize={9} fill="rgba(148,163,184,.55)" className="num">{t * 100}%</text>
-            <text x={sx(t)} y={H - m + 14} textAnchor="middle" fontSize={9} fill="rgba(148,163,184,.55)" className="num">{t * 100}%</text>
+            <line x1={sx(0)} x2={sx(1)} y1={sy(t)} y2={sy(t)} stroke="rgba(28,25,23,0.07)" />
+            <text x={sx(0) - 6} y={sy(t)} dy="0.32em" textAnchor="end" fontSize={9} fill="rgba(87,83,78,.55)" className="num">{t * 100}%</text>
+            <text x={sx(t)} y={H - m + 14} textAnchor="middle" fontSize={9} fill="rgba(87,83,78,.55)" className="num">{t * 100}%</text>
           </g>
         ))}
-        <line x1={sx(0)} y1={sy(0)} x2={sx(1)} y2={sy(1)} stroke="rgba(226,232,240,.3)" strokeDasharray="4 4" />
-        <motion.polyline key={cp} points={pts.map((p) => `${sx(p.predicted)},${sy(p.observed)}`).join(" ")} fill="none" stroke="#22d3ee" strokeWidth={2} initial={{ pathLength: 0 }} animate={{ pathLength: 1 }} transition={{ duration: 0.9 }} />
+        <line x1={sx(0)} y1={sy(0)} x2={sx(1)} y2={sy(1)} stroke="rgba(28,25,23,.3)" strokeDasharray="4 4" />
+        <motion.polyline key={cp} points={pts.map((p) => `${sx(p.predicted)},${sy(p.observed)}`).join(" ")} fill="none" stroke="#2952CC" strokeWidth={2} initial={{ pathLength: 0 }} animate={{ pathLength: 1 }} transition={{ duration: 0.9 }} />
         {pts.map((p) => (
-          <motion.circle key={`${cp}-${p.bin}`} cx={sx(p.predicted)} cy={sy(p.observed)} r={3 + Math.sqrt(p.n)} fill="rgba(34,211,238,.25)" stroke="#22d3ee" initial={{ scale: 0 }} animate={{ scale: 1 }} />
+          <motion.circle key={`${cp}-${p.bin}`} cx={sx(p.predicted)} cy={sy(p.observed)} r={3 + Math.sqrt(p.n)} fill="rgba(41,82,204,.25)" stroke="#2952CC" initial={{ scale: 0 }} animate={{ scale: 1 }} />
         ))}
-        <text x={(sx(0) + sx(1)) / 2} y={H - 4} textAnchor="middle" fontSize={10} fill="rgba(148,163,184,.8)">Predicted P(late)</text>
-        <text transform={`translate(9 ${(sy(0) + sy(1)) / 2}) rotate(-90)`} textAnchor="middle" fontSize={10} fill="rgba(148,163,184,.8)">Observed late rate</text>
+        <text x={(sx(0) + sx(1)) / 2} y={H - 4} textAnchor="middle" fontSize={10} fill="rgba(87,83,78,.8)">Predicted P(late)</text>
+        <text transform={`translate(9 ${(sy(0) + sy(1)) / 2}) rotate(-90)`} textAnchor="middle" fontSize={10} fill="rgba(87,83,78,.8)">Observed late rate</text>
       </svg>
     </div>
   );

@@ -5,6 +5,12 @@ import land110 from "world-atlas/land-110m.json";
 import type { FleetItem, Geo } from "../lib/data";
 import { LANE_COLORS, delayColor, fmtH, hours } from "../lib/data";
 
+// label placement for ports that sit close together
+const LABEL_OFFSET: Record<string, [number, number, string]> = {
+  NLRTM: [-7, 4, "right"], DEHAM: [6, -6, "left"], CNSHA: [7, 4, "left"], CNYTN: [7, 10, "left"],
+  KRPUS: [7, -4, "left"], SGSIN: [7, 10, "left"], LKCMB: [7, 10, "left"], INMAA: [-7, 3, "right"], VNSGN: [7, 3, "left"],
+};
+
 const LAND = feature(land110 as any, (land110 as any).objects.land) as any;
 
 interface Props {
@@ -126,39 +132,36 @@ export default function Globe({ geo, fleet, clockH, focusLane, focusId, onPick, 
       proj.rotate(rot.current);
       ctx.clearRect(0, 0, w, height);
 
-      // atmosphere
       const cx = gx, cy = height / 2;
-      const glow = ctx.createRadialGradient(cx, cy, R * 0.9, cx, cy, R * 1.25);
-      glow.addColorStop(0, "rgba(34,211,238,0.22)");
-      glow.addColorStop(1, "rgba(34,211,238,0)");
-      ctx.fillStyle = glow;
+      // soft drop shadow under the sphere
+      const sh = ctx.createRadialGradient(cx, cy + R * 0.04, R * 0.92, cx, cy + R * 0.04, R * 1.08);
+      sh.addColorStop(0, "rgba(28,25,23,0.10)");
+      sh.addColorStop(1, "rgba(28,25,23,0)");
+      ctx.fillStyle = sh;
       ctx.beginPath();
-      ctx.arc(cx, cy, R * 1.25, 0, Math.PI * 2);
+      ctx.arc(cx, cy + R * 0.04, R * 1.08, 0, Math.PI * 2);
       ctx.fill();
       // ocean
-      const oc = ctx.createRadialGradient(cx - R * 0.35, cy - R * 0.4, R * 0.1, cx, cy, R);
-      oc.addColorStop(0, "#0d1a33");
-      oc.addColorStop(1, "#050a16");
-      ctx.fillStyle = oc;
+      ctx.fillStyle = "#E9EEF2";
       ctx.beginPath();
       path({ type: "Sphere" } as any);
       ctx.fill();
-      ctx.strokeStyle = "rgba(103,232,249,0.25)";
+      ctx.strokeStyle = "#C9D1D8";
       ctx.lineWidth = 1;
       ctx.stroke();
       // graticule
       ctx.beginPath();
       path(grat);
-      ctx.strokeStyle = "rgba(148,163,184,0.06)";
+      ctx.strokeStyle = "rgba(28,25,23,0.05)";
       ctx.lineWidth = 0.6;
       ctx.stroke();
       // land
       ctx.beginPath();
       path(LAND);
-      ctx.fillStyle = "rgba(148,163,184,0.13)";
+      ctx.fillStyle = "#FBFAF7";
       ctx.fill();
-      ctx.strokeStyle = "rgba(186,230,253,0.22)";
-      ctx.lineWidth = 0.5;
+      ctx.strokeStyle = "#BFC6CC";
+      ctx.lineWidth = 0.6;
       ctx.stroke();
 
       // lanes
@@ -166,22 +169,15 @@ export default function Globe({ geo, fleet, clockH, focusLane, focusId, onPick, 
       for (const [id, r] of Object.entries(routes)) {
         const focused = focusLane === id;
         const dim = focusLane && !focused;
-        const col = LANE_COLORS[id] ?? "#67e8f9";
+        const col = LANE_COLORS[id] ?? "#2952CC";
         ctx.beginPath();
         path({ type: "LineString", coordinates: r.pts } as any);
-        ctx.strokeStyle = col + (dim ? "22" : focused ? "ee" : "66");
-        ctx.lineWidth = focused ? 2.2 : 1.1;
-        ctx.setLineDash(focused ? [] : [3, 4]);
-        ctx.lineDashOffset = -tPulse * 14;
+        ctx.strokeStyle = col + (dim ? "22" : focused ? "ff" : "8c");
+        ctx.lineWidth = focused ? 2.2 : 1.2;
+        ctx.setLineDash(focused ? [] : [4, 3]);
+        ctx.lineDashOffset = -tPulse * 7;
         ctx.stroke();
         ctx.setLineDash([]);
-        if (focused) {
-          ctx.beginPath();
-          path({ type: "LineString", coordinates: r.pts } as any);
-          ctx.strokeStyle = col + "33";
-          ctx.lineWidth = 8;
-          ctx.stroke();
-        }
       }
 
       // ports
@@ -189,19 +185,22 @@ export default function Globe({ geo, fleet, clockH, focusLane, focusId, onPick, 
         const vis = d3.geoDistance([p.lon, p.lat], [-rot.current[0], -rot.current[1]]) < Math.PI / 2;
         if (!vis) continue;
         const [x, y] = proj([p.lon, p.lat])!;
-        const pr = 3 + 6 * ((now / 1600 + code.length * 0.13) % 1);
         ctx.beginPath();
-        ctx.arc(x, y, pr, 0, Math.PI * 2);
-        ctx.strokeStyle = `rgba(103,232,249,${0.5 * (1 - (pr - 3) / 6)})`;
-        ctx.lineWidth = 1;
-        ctx.stroke();
-        ctx.beginPath();
-        ctx.arc(x, y, 2.4, 0, Math.PI * 2);
-        ctx.fillStyle = "#e6fbff";
+        ctx.arc(x, y, 3, 0, Math.PI * 2);
+        ctx.fillStyle = "#FFFFFF";
         ctx.fill();
-        ctx.font = "500 10px Inter Variable, sans-serif";
-        ctx.fillStyle = "rgba(226,232,240,0.7)";
-        ctx.fillText(p.name, x + 6, y - 6);
+        ctx.strokeStyle = "#1C1917";
+        ctx.lineWidth = 1.4;
+        ctx.stroke();
+        const [dx, dy, align] = LABEL_OFFSET[code] ?? [6, -6, "left"];
+        ctx.font = "500 10.5px 'IBM Plex Sans', sans-serif";
+        ctx.textAlign = align as CanvasTextAlign;
+        ctx.lineWidth = 3;
+        ctx.strokeStyle = "rgba(251,250,247,0.9)";
+        ctx.strokeText(p.name, x + dx, y + dy);
+        ctx.fillStyle = "#44403C";
+        ctx.fillText(p.name, x + dx, y + dy);
+        ctx.textAlign = "left";
       }
 
       // ships
@@ -212,22 +211,13 @@ export default function Globe({ geo, fleet, clockH, focusLane, focusId, onPick, 
         const sel = s.id === focusId;
         const dim = focusLane && s.lane !== focusLane;
         ctx.globalAlpha = dim ? 0.25 : 1;
-        const g = ctx.createRadialGradient(x, y, 0, x, y, sel ? 14 : 8);
-        g.addColorStop(0, s.color + "cc");
-        g.addColorStop(1, s.color + "00");
-        ctx.fillStyle = g;
         ctx.beginPath();
-        ctx.arc(x, y, sel ? 14 : 8, 0, Math.PI * 2);
-        ctx.fill();
-        ctx.beginPath();
-        ctx.arc(x, y, sel ? 4 : 2.6, 0, Math.PI * 2);
+        ctx.arc(x, y, sel ? 5.5 : 4, 0, Math.PI * 2);
         ctx.fillStyle = s.color;
         ctx.fill();
-        if (sel) {
-          ctx.strokeStyle = "#fff";
-          ctx.lineWidth = 1.5;
-          ctx.stroke();
-        }
+        ctx.strokeStyle = sel ? "#1C1917" : "#FFFFFF";
+        ctx.lineWidth = sel ? 2 : 1.4;
+        ctx.stroke();
         ctx.globalAlpha = 1;
       }
       raf = requestAnimationFrame(frame);
@@ -287,10 +277,10 @@ export default function Globe({ geo, fleet, clockH, focusLane, focusId, onPick, 
     <div ref={wrap} className="relative w-full select-none" style={{ height }}>
       <canvas ref={canvas} style={{ width: w, height }} className="block touch-none" aria-label="Interactive globe of shipment lanes; drag to rotate" />
       {hover && (
-        <div className="pointer-events-none absolute z-20 rounded-xl border border-white/10 bg-ink-850/95 px-3 py-2 text-xs shadow-2xl backdrop-blur"
+        <div className="pointer-events-none absolute z-20 rounded-lg border border-stone-200 bg-white px-3 py-2 text-xs shadow-lg"
           style={{ left: hover.x + 14, top: hover.y + 10 }}>
-          <div className="num font-semibold text-slate-100">{hover.ship.id}</div>
-          <div className="text-slate-400">{hover.ship.lane}{hover.ship.cape ? " · via Cape" : ""}</div>
+          <div className="num font-semibold text-stone-900">{hover.ship.id}</div>
+          <div className="text-stone-500">{hover.ship.lane}{hover.ship.cape ? " · via Cape" : ""}</div>
           <div className="mt-1" style={{ color: hover.ship.color }}>Final delay {fmtH(hover.ship.delay)}</div>
         </div>
       )}

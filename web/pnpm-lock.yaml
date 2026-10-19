@@ -11,6 +11,12 @@ importers:
       '@fontsource-variable/inter':
         specifier: 5.1.0
         version: 5.1.0
+      '@fontsource/ibm-plex-mono':
+        specifier: 5.1.0
+        version: 5.1.0
+      '@fontsource/ibm-plex-sans':
+        specifier: 5.1.0
+        version: 5.1.0
       '@fontsource/jetbrains-mono':
         specifier: 5.1.0
         version: 5.1.0
@@ -296,6 +302,12 @@ packages:
 
   '@fontsource-variable/inter@5.1.0':
     resolution: {integrity: sha512-Wj2dUGP0vUpxRGQTXQTCNJO+aLcFcQm+gUPXfj/aS877bQkEPBPv9JvZJpwdm2vzelt8NTZ+ausKlBCJjh2XIg==}
+
+  '@fontsource/ibm-plex-mono@5.1.0':
+    resolution: {integrity: sha512-XKsZNyRCj6tz8zlatHmniSoLVephMD5GQG2sXgcaEb8DkUO+O61r28uTlIMEZuoZXtP4c4STvL+KUlJM5jZOEg==}
+
+  '@fontsource/ibm-plex-sans@5.1.0':
+    resolution: {integrity: sha512-v2aFHGh33ogG+At6dVNUCX6vWlNAhQ6STWj5WrBKPxVWX1SsAnHNq8sXQBa7WHEt29Irmozuk7GTp6GzFlpwdQ==}
 
   '@fontsource/jetbrains-mono@5.1.0':
     resolution: {integrity: sha512-YzWpGYY3PoqvmvwW2Hb4NwkN5C7LO0FmZugEGcFe6cNNE/cMgH9JhW5LI6hjG+1+nwgSHyJtKmblHNrUqlyhWg==}
@@ -1402,6 +1414,10 @@ snapshots:
     optional: true
 
   '@fontsource-variable/inter@5.1.0': {}
+
+  '@fontsource/ibm-plex-mono@5.1.0': {}
+
+  '@fontsource/ibm-plex-sans@5.1.0': {}
 
   '@fontsource/jetbrains-mono@5.1.0': {}
 

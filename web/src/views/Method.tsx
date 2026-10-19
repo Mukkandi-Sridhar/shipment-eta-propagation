@@ -14,18 +14,18 @@ export default function Method() {
   return (
     <div className="space-y-5">
       <Card className="p-0" glow>
-        <CardHeader kicker="System design" title={<span className="flex items-center gap-2"><Workflow size={15} className="text-cyan-300" />From raw events to an explained ETA</span>} />
+        <CardHeader kicker="System design" title={<span className="flex items-center gap-2"><Workflow size={15} className="text-accent-600" />From raw events to an explained ETA</span>} />
         <div className="grid gap-3 p-5 pt-4 md:grid-cols-5">
           {STEPS.map((s, i) => (
             <motion.div key={s.title} initial={{ opacity: 0, y: 14 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 + i * 0.1 }}
-              className="relative rounded-2xl border border-white/5 bg-white/[0.025] p-4">
+              className="relative rounded-2xl border border-stone-200 bg-stone-50 p-4">
               <div className="mb-3 flex items-center justify-between">
-                <span className="grid h-9 w-9 place-items-center rounded-xl bg-cyan-300/10 text-cyan-300 shadow-[0_0_20px_rgba(34,211,238,.2)]"><s.icon size={17} /></span>
-                <span className="num text-[11px] text-slate-600">0{i + 1}</span>
+                <span className="grid h-9 w-9 place-items-center rounded-xl bg-accent-50 text-accent-600"><s.icon size={17} /></span>
+                <span className="num text-[11px] text-stone-400">0{i + 1}</span>
               </div>
-              <div className="text-[13px] font-semibold text-slate-100">{s.title}</div>
-              <div className="mt-1.5 text-[12px] leading-relaxed text-slate-400">{s.body}</div>
-              {i < STEPS.length - 1 && <div className="absolute -right-2.5 top-1/2 hidden h-px w-5 bg-gradient-to-r from-cyan-300/60 to-transparent md:block" />}
+              <div className="text-[13px] font-semibold text-stone-900">{s.title}</div>
+              <div className="mt-1.5 text-[12px] leading-relaxed text-stone-500">{s.body}</div>
+              {i < STEPS.length - 1 && <div className="absolute -right-2.5 top-1/2 hidden h-px w-5 bg-stone-300 md:block" />}
             </motion.div>
           ))}
         </div>
@@ -34,9 +34,9 @@ export default function Method() {
       <div className="grid gap-5 lg:grid-cols-2">
         <Card className="p-0">
           <CardHeader kicker="Definitions" title="How ETA and delay are measured" />
-          <div className="space-y-3 p-5 pt-4 text-[12.5px] leading-relaxed text-slate-300">
+          <div className="space-y-3 p-5 pt-4 text-[12.5px] leading-relaxed text-stone-700">
             <Def k="Promised delivery">Carrier schedule + planned port, customs and inland buffers, fixed at booking (for rail: the first ramp departure after the appointment).</Def>
-            <Def k="Delivery delay">Actual proof-of-delivery − promised delivery, in hours. <span className="text-slate-400">Late</span> = delay &gt; 24h.</Def>
+            <Def k="Delivery delay">Actual proof-of-delivery − promised delivery, in hours. <span className="text-stone-500">Late</span> = delay &gt; 24h.</Def>
             <Def k="Stage overrun">(actual end − actual start) − (scheduled end − scheduled start). Overruns sum to the delivery delay.</Def>
             <Def k="Checkpoint">The moment a forecast is made: booking (48h before sailing), departure, arrival, discharge, customs release. Only information reported by then is used: congestion and weather <em>as observed then</em>, not as they turned out.</Def>
             <Def k="ETA">Promised delivery + P50 of the predicted delay, shown with its P10–P90 window.</Def>
@@ -44,8 +44,8 @@ export default function Method() {
           </div>
         </Card>
         <Card className="p-0">
-          <CardHeader kicker="Mechanisms in the simulator" title={<span className="flex items-center gap-2"><Boxes size={15} className="text-violet-300" />Real logistics behaviour encoded</span>} />
-          <div className="grid gap-2 p-5 pt-4 text-[12px] text-slate-300 sm:grid-cols-2">
+          <CardHeader kicker="Mechanisms in the simulator" title={<span className="flex items-center gap-2"><Boxes size={15} className="text-[#7C5CC4]" />Real logistics behaviour encoded</span>} />
+          <div className="grid gap-2 p-5 pt-4 text-[12px] text-stone-700 sm:grid-cols-2">
             {[
               ["Rollovers", "Congested origin + low-reliability carrier → cargo bumped to next week's sailing (+168h)."],
               ["Speed recovery", "Late vessels steam faster, recovering up to ~4.5% of the transit time."],
@@ -56,7 +56,7 @@ export default function Method() {
               ["Disruptions", "Red Sea / Cape diversions (+10 days, Mar–May), labour strikes at Hamburg and New York, US peak season, pre-Lunar-New-Year rush."],
               ["Data gaps", "3–20% of milestone events are missing, as with real EDI and AIS feeds."],
             ].map(([k, v]) => (
-              <div key={k} className="rounded-xl border border-white/5 bg-white/[0.02] p-3"><div className="mb-0.5 text-[11.5px] font-semibold text-cyan-200">{k}</div><div className="leading-relaxed text-slate-400">{v}</div></div>
+              <div key={k} className="rounded-xl border border-stone-200 bg-stone-50 p-3"><div className="mb-0.5 text-[11.5px] font-semibold text-accent-700">{k}</div><div className="leading-relaxed text-stone-500">{v}</div></div>
             ))}
           </div>
         </Card>
@@ -64,7 +64,7 @@ export default function Method() {
 
       <Card className="p-0">
         <CardHeader kicker="Read before trusting the numbers" title={<span className="flex items-center gap-2"><AlertTriangle size={15} className="text-amber-300" />Assumptions and limitations</span>} />
-        <div className="grid gap-x-8 gap-y-2 p-5 pt-4 text-[12.5px] leading-relaxed text-slate-400 md:grid-cols-2">
+        <div className="grid gap-x-8 gap-y-2 p-5 pt-4 text-[12.5px] leading-relaxed text-stone-500 md:grid-cols-2">
           {[
             "The data is synthetic. The model recovers mechanisms I wrote into the simulator, so good scores show the method works, not that real-world accuracy is known.",
             "90 test shipments is small: lane-level numbers are noisy, and confidence intervals are reported for that reason.",
@@ -75,7 +75,7 @@ export default function Method() {
             "When an event is missing, the chain restarts from the last reported milestone. It ignores the clock, so it does not use \"no arrival reported by now\" as evidence.",
             "Production next steps: real AIS and port-call feeds, carrier schedule APIs, per-lane recalibration, drift monitoring and a feedback loop from realised ETAs.",
           ].map((t, i) => (
-            <div key={i} className="flex gap-2.5"><span className="num mt-0.5 text-[10px] text-amber-300/70">{String(i + 1).padStart(2, "0")}</span><span>{t}</span></div>
+            <div key={i} className="flex gap-2.5"><span className="num mt-0.5 text-[10px] text-amber-700">{String(i + 1).padStart(2, "0")}</span><span>{t}</span></div>
           ))}
         </div>
       </Card>
@@ -85,8 +85,8 @@ export default function Method() {
 
 function Def({ k, children }: { k: string; children: React.ReactNode }) {
   return (
-    <div className="grid grid-cols-[130px_1fr] gap-3 border-b border-white/5 pb-3 last:border-0 last:pb-0">
-      <span className="text-[11.5px] font-semibold text-cyan-200">{k}</span>
+    <div className="grid grid-cols-[130px_1fr] gap-3 border-b border-stone-200 pb-3 last:border-0 last:pb-0">
+      <span className="text-[11.5px] font-semibold text-accent-700">{k}</span>
       <span>{children}</span>
     </div>
   );
