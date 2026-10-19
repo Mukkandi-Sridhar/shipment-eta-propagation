@@ -333,7 +333,7 @@ function WhatIf({ s, cp, base, scenario, setScenario }: { s: ShipmentDetail; cp:
       <div className="space-y-4 p-4 pt-4 sm:p-5 sm:pt-4">
         {alive === false && (
           <div className="rounded-xl border border-amber-200 bg-amber-50 p-3 text-[12px] text-amber-800">
-            Live re-forecasting needs the model API. Run <code className="num rounded bg-stone-100 px-1.5 py-0.5">make serve</code> and open the dashboard from <code className="num">localhost:8000</code>.
+            This hosted copy is static, so the sliders are off: re-forecasting runs the model live on the Python API. Clone the <a className="underline" href="https://github.com/Mukkandi-Sridhar/shipment-eta-propagation" target="_blank" rel="noreferrer">repository</a>, run <code className="num rounded bg-white px-1.5 py-0.5">make serve</code>, and open <code className="num">localhost:8000</code>. The demo video shows it working.
           </div>
         )}
         {slider("Extra upstream delay", v.extra, 0, 168, 6, (x) => setV({ ...v, extra: x }), (x) => `+${x}h`, "a late vessel or a rollover")}
