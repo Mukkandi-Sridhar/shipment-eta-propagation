@@ -16,6 +16,8 @@ export async function whatIf(req: WhatIfReq, signal?: AbortSignal): Promise<Pred
 }
 
 export async function apiAlive(): Promise<boolean> {
+  // static hosting (GitHub Pages) has no model API; don't probe and log a 404
+  if (!BASE && location.hostname.endsWith("github.io")) return false;
   try {
     const r = await fetch(`${BASE}/api/health`, { signal: AbortSignal.timeout(1500) });
     return r.ok;
