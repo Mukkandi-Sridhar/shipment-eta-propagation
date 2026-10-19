@@ -1,5 +1,5 @@
 import { AnimatePresence, motion } from "framer-motion";
-import { Anchor, ArrowRight, Eye, EyeOff, FileWarning, Pause, Play, RotateCcw, Search, Ship, Train, Truck, UserPlus, Wand2 } from "lucide-react";
+import { Anchor, ArrowRight, ChevronLeft, ChevronRight, Eye, EyeOff, FileWarning, Pause, Play, RotateCcw, Search, Ship, Train, Truck, UserPlus, Wand2 } from "lucide-react";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { DelayWaterfall, JourneyTimeline } from "../components/journey";
 import { DivergingBars, Histogram, LineChart } from "../components/charts";
@@ -25,20 +25,23 @@ export default function ShipmentView({ data, id, setId }: { data: AppData; id: s
   const p = scenario ?? base;
 
   return (
-    <div className="grid gap-5 xl:grid-cols-[300px_1fr]">
-      <ShipmentList data={data} id={id} setId={(v) => { setId(v); setReveal(false); }} cp={cp} />
-      <div className="min-w-0 space-y-5">
+    <div className="grid gap-4 sm:gap-5 xl:grid-cols-[300px_1fr]">
+      <div className="hidden xl:block">
+        <ShipmentList data={data} id={id} setId={(v) => { setId(v); setReveal(false); }} cp={cp} />
+      </div>
+      <div className="min-w-0 space-y-4 sm:space-y-5">
+        <MobilePicker data={data} id={id} cp={cp} setId={(v) => { setId(v); setReveal(false); }} />
         <Header s={s} />
         <Card className="p-4" delay={0.05}>
-          <div className="flex flex-wrap items-center justify-between gap-4">
+          <div className="flex flex-col gap-4 sm:flex-row sm:flex-wrap sm:items-center sm:justify-between">
             <CheckpointStepper cp={cp} setCp={(c) => { setPlaying(false); setCp(c); }} s={s} />
-            <div className="flex items-center gap-2">
+            <div className="grid grid-cols-2 gap-2 sm:flex sm:items-center">
               <button onClick={() => { if (cp >= 4) setCp(0); setPlaying((v) => !v); }}
-                className="flex items-center gap-2 rounded-xl border border-accent-200 bg-accent-50 px-3 py-2 text-xs font-medium text-accent-700 transition hover:bg-accent-100">
+                className="flex items-center justify-center gap-2 rounded-xl border border-accent-200 bg-accent-50 px-3 py-2 text-xs font-medium text-accent-700 transition hover:bg-accent-100">
                 {playing ? <Pause size={13} /> : <Play size={13} />} {playing ? "Pause" : "Replay journey"}
               </button>
               <button onClick={() => setReveal((v) => !v)}
-                className={`flex items-center gap-2 rounded-xl border px-3 py-2 text-xs font-medium transition ${reveal ? "border-stone-500 bg-stone-200 text-stone-900" : "border-stone-200 text-stone-500 hover:text-stone-800"}`}>
+                className={`flex items-center justify-center gap-2 rounded-xl border px-3 py-2 text-xs font-medium transition ${reveal ? "border-stone-500 bg-stone-200 text-stone-900" : "border-stone-200 text-stone-500 hover:text-stone-800"}`}>
                 {reveal ? <Eye size={13} /> : <EyeOff size={13} />} {reveal ? "Actual shown" : "Reveal actual"}
               </button>
             </div>
@@ -50,7 +53,7 @@ export default function ShipmentView({ data, id, setId }: { data: AppData; id: s
           <Card delay={0.1} className="p-0">
             <CardHeader kicker={scenario ? "What-if scenario" : p.checkpoint_label} title="Why this forecast"
               info="Generated from the model's own numbers (stage forecasts, knock-on counterfactuals, SHAP factor sums), so every sentence traces back to a quantity on this page. Template-based, not an LLM, so it cannot invent causes." />
-            <div className="p-5 pt-4">
+            <div className="p-4 pt-4 sm:p-5 sm:pt-4">
               <Narrative lines={p.narrative} />
               {p.actions && p.actions.length > 0 && (
                 <div className="mt-5 space-y-2">
@@ -74,19 +77,20 @@ export default function ShipmentView({ data, id, setId }: { data: AppData; id: s
 
         <Card delay={0.15} className="p-0">
           <CardHeader kicker="Stage timeline" title="Planned vs reported vs forecast" info="Dashed outlines are the carrier's planned stage windows. Solid bars are reported milestones; striped bars are the chain's forecast for the remaining stages. The shaded column is the 80% delivery window." />
-          <div className="p-4 pt-3"><JourneyTimeline s={s} p={p} truth={reveal} /></div>
+          <div className="overflow-x-auto p-4 pt-3"><div className="min-w-[580px]"><JourneyTimeline s={s} p={p} truth={reveal} /></div></div>
+          <div className="px-4 pb-3 text-[11px] text-stone-400 sm:hidden">Swipe sideways to see the full timeline.</div>
         </Card>
 
         <div className="grid gap-5 2xl:grid-cols-2">
           <Card delay={0.2} className="p-0">
             <CardHeader kicker="Delay propagation" title="How the delay builds up, stage by stage"
               info="Each forecast stage is split into new delay created there and knock-on: the extra (or saved) time caused only by entering the stage late. Knock-on = stage forecast at the actual lateness minus the forecast if the shipment had arrived on time, with all else equal." />
-            <div className="p-4 pt-3"><DelayWaterfall p={p} /></div>
+            <div className="overflow-x-auto p-4 pt-3"><div className="min-w-[420px]"><DelayWaterfall p={p} /></div></div>
           </Card>
           <Card delay={0.25} className="p-0">
             <CardHeader kicker="Attribution" title="What is driving the forecast"
               info="Interventional TreeSHAP for every remaining stage model, measured against shipments that arrive at that stage on time, then summed along the chain and grouped into business factors. Observed + reference + factors = expected delay." />
-            <div className="p-5 pt-4">
+            <div className="p-4 pt-4 sm:p-5 sm:pt-4">
               <DivergingBars items={p.factors.filter((f) => f.kind !== "factor" || Math.abs(f.hours) >= 0.5).map((f) => ({
                 key: f.group, label: f.group, value: f.hours, muted: f.kind !== "factor",
                 color: f.kind === "observed" ? "#8B8680" : f.kind === "baseline" ? "#A8A29E" : undefined,
@@ -147,21 +151,21 @@ function Header({ s }: { s: ShipmentDetail }) {
 
 function CheckpointStepper({ cp, setCp, s }: { cp: number; setCp: (c: number) => void; s: ShipmentDetail }) {
   return (
-    <div className="flex items-center">
+    <div className="flex w-full items-center sm:w-auto">
       {CHECKPOINT_SHORT.map((l, i) => {
         const done = i <= cp;
         const missing = i > 0 && !s.milestones[i - 1].reported;
         return (
-          <div key={l} className="flex items-center">
-            <button onClick={() => setCp(i)} className="group flex flex-col items-center gap-1.5 px-1" aria-label={`Checkpoint ${l}`}>
-              <span className={`relative grid h-7 w-7 place-items-center rounded-full border text-[11px] font-semibold transition ${i === cp ? "border-accent-600 bg-accent-600 text-white" : done ? "border-accent-200 bg-accent-50 text-accent-700" : "border-stone-300 text-stone-500 group-hover:border-stone-400"}`}>
+          <div key={l} className={`flex items-center ${i < 4 ? "flex-1 sm:flex-none" : ""}`}>
+            <button onClick={() => setCp(i)} className="group flex flex-col items-center gap-1.5 px-0.5 sm:px-1" aria-label={`Checkpoint ${l}`}>
+              <span className={`relative grid h-8 w-8 place-items-center rounded-full border text-[11px] sm:h-7 sm:w-7 font-semibold transition ${i === cp ? "border-accent-600 bg-accent-600 text-white" : done ? "border-accent-200 bg-accent-50 text-accent-700" : "border-stone-300 text-stone-500 group-hover:border-stone-400"}`}>
                 {i + 1}
                 {missing && <span className="absolute -right-0.5 -top-0.5 h-2 w-2 rounded-full bg-amber-500" title="Milestone event not received" />}
               </span>
-              <span className={`text-[10.5px] ${i === cp ? "text-accent-700" : "text-stone-500"}`}>{l}</span>
+              <span className={`text-[10px] sm:text-[10.5px] ${i === cp ? "text-accent-700" : "text-stone-500"}`}>{l}</span>
             </button>
             {i < 4 && (
-              <div className="relative mx-1 mb-5 h-px w-8 bg-stone-200 sm:w-12">
+              <div className="relative mx-0.5 mb-5 h-px flex-1 bg-stone-200 sm:mx-1 sm:w-12 sm:flex-none">
                 <motion.div className="absolute inset-y-0 left-0 bg-accent-600" initial={false} animate={{ width: i < cp ? "100%" : "0%" }} transition={{ duration: 0.5 }} />
               </div>
             )}
@@ -176,10 +180,9 @@ function EtaCard({ s, p, reveal, scenario }: { s: ShipmentDetail; p: Prediction;
   const col = riskColor(p.p_late);
   return (
     <Card delay={0.08} className="overflow-hidden p-0" glow={scenario}>
-      <div className="absolute -left-16 -top-16 h-48 w-48 rounded-full opacity-20 blur-3xl" style={{ background: col }} />
       <CardHeader kicker={scenario ? "What-if scenario" : `Forecast · ${p.checkpoint_label}`} title="Estimated delivery"
         info="ETA = promised delivery + predicted delay. P50 is the median of 400 Monte-Carlo journeys, each sampling residual errors stage by stage, so uncertainty propagates down the chain along with the delay." />
-      <div className="grid gap-4 p-5 pt-3 md:grid-cols-[1fr_auto]">
+      <div className="grid gap-4 p-4 pt-3 sm:p-5 sm:pt-3 md:grid-cols-[1fr_auto]">
         <div>
           <motion.div key={p.eta_p50} initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} className="num text-[38px] font-semibold leading-none tracking-tight text-stone-900">
             {fmtDate(p.eta_p50)}
@@ -190,9 +193,9 @@ function EtaCard({ s, p, reveal, scenario }: { s: ShipmentDetail; p: Prediction;
           </div>
           <div className="mt-4 grid grid-cols-3 gap-2">
             {[["P10", p.eta_p10, p.delay_p10_h], ["P50", p.eta_p50, p.delay_p50_h], ["P90", p.eta_p90, p.delay_p90_h]].map(([k, d, h]) => (
-              <div key={k as string} className="rounded-xl border border-stone-200 bg-stone-50 px-3 py-2">
+              <div key={k as string} className="rounded-xl border border-stone-200 bg-stone-50 px-2.5 py-2 sm:px-3">
                 <div className="text-[11.5px] text-stone-500">{k}</div>
-                <div className="num text-[12px] text-stone-800">{fmtDate(d as string)}</div>
+                <div className="num whitespace-nowrap text-[11px] text-stone-800 sm:text-[12px]">{fmtDate(d as string)}</div>
                 <div className="num text-[11px] text-stone-500">{fmtH(h as number)}</div>
               </div>
             ))}
@@ -271,7 +274,7 @@ function WhatIf({ s, cp, base, scenario, setScenario }: { s: ShipmentDetail; cp:
           <button onClick={() => setV({ cong: inp.cong_dest_now, weather: inp.weather_now, extra: 0, docs: !!inp.docs_complete, rel: inp.carrier_reliability })} className="flex items-center gap-1 rounded-lg px-2 py-1 text-[11px] text-stone-500 hover:bg-stone-100 hover:text-stone-800"><RotateCcw size={11} />Reset</button>
         </div>}
         info="Changes the inputs the model sees at this checkpoint and re-runs the whole stage chain live, so the effects propagate downstream. Runs on the FastAPI backend." />
-      <div className="space-y-4 p-5 pt-4">
+      <div className="space-y-4 p-4 pt-4 sm:p-5 sm:pt-4">
         {alive === false && (
           <div className="rounded-xl border border-amber-200 bg-amber-50 p-3 text-[12px] text-amber-800">
             Live re-forecasting needs the model API. Run <code className="num rounded bg-stone-100 px-1.5 py-0.5">make serve</code> and open the dashboard from <code className="num">localhost:8000</code>.
@@ -325,7 +328,7 @@ function TruthCard({ s, p }: { s: ShipmentDetail; p: Prediction }) {
       <Card className="p-0">
         <CardHeader kicker="Ground truth from the simulator" title="Did the explanation point at the right place?"
           info="The simulator logs every mechanism it triggered and the true overrun of each stage. Compare those with the model's forecast at the selected checkpoint." />
-        <div className="grid gap-6 p-5 pt-4 lg:grid-cols-[260px_1fr]">
+        <div className="grid gap-6 p-4 pt-4 sm:p-5 sm:pt-4 lg:grid-cols-[260px_1fr]">
           <div>
             <div className="text-[11.5px] text-stone-500">Actual delivery</div>
             <div className="num mt-1 text-2xl font-semibold text-stone-900">{fmtDate(s.truth.delivered)}</div>
@@ -361,7 +364,7 @@ function TruthCard({ s, p }: { s: ShipmentDetail; p: Prediction }) {
   );
 }
 
-function ShipmentList({ data, id, setId, cp }: { data: AppData; id: string; setId: (id: string) => void; cp: number }) {
+function ShipmentList({ data, id, setId, cp, sheet = false }: { data: AppData; id: string; setId: (id: string) => void; cp: number; sheet?: boolean }) {
   const [q, setQ] = useState("");
   const [risk, setRisk] = useState<"all" | "high" | "low">("all");
   const list = useMemo(() => Object.values(data.shipments)
@@ -369,13 +372,14 @@ function ShipmentList({ data, id, setId, cp }: { data: AppData; id: string; setI
     .filter((s) => risk === "all" || (risk === "high" ? s.predictions[cp].p_late >= 0.5 : s.predictions[cp].p_late < 0.5))
     .sort((a, b) => b.predictions[cp].p_late - a.predictions[cp].p_late), [data, q, risk, cp]);
   return (
-    <Card className="flex max-h-[calc(100vh-120px)] flex-col p-0 xl:sticky xl:top-[88px]">
+    <Card className={`flex flex-col p-0 ${sheet ? "max-h-[78vh] rounded-b-none border-b-0" : "max-h-[calc(100vh-120px)] xl:sticky xl:top-[88px]"}`}>
       <div className="space-y-3 p-4">
-        <div className="text-[11.5px] text-accent-600">Test shipments · unseen in training</div>
+        {sheet && <div className="mx-auto -mt-1 mb-1 h-1 w-10 rounded-full bg-stone-300" />}
+        <div className="text-[12px] text-stone-500">{list.length} test shipments, unseen in training · sorted by risk</div>
         <div className="relative">
           <Search size={13} className="absolute left-3 top-1/2 -translate-y-1/2 text-stone-500" />
           <input value={q} onChange={(e) => setQ(e.target.value)} placeholder="Search id, lane, carrier…" aria-label="Search shipments"
-            className="w-full rounded-xl border border-stone-200 bg-stone-50 py-2 pl-8 pr-3 text-[12.5px] text-stone-800 placeholder:text-stone-400 focus:border-accent-300 focus:outline-none" />
+            className="w-full rounded-xl border border-stone-200 bg-stone-50 py-2.5 pl-8 pr-3 text-[16px] sm:py-2 sm:text-[12.5px] text-stone-800 placeholder:text-stone-400 focus:border-accent-300 focus:outline-none" />
         </div>
         <Segmented size="sm" value={risk} onChange={setRisk} options={[{ value: "all", label: `All` }, { value: "high", label: "At risk" }, { value: "low", label: "On track" }]} />
       </div>
@@ -403,5 +407,43 @@ function ShipmentList({ data, id, setId, cp }: { data: AppData; id: string; setI
         })}
       </div>
     </Card>
+  );
+}
+
+function MobilePicker({ data, id, cp, setId }: { data: AppData; id: string; cp: number; setId: (id: string) => void }) {
+  const [open, setOpen] = useState(false);
+  const ordered = useMemo(() => Object.values(data.shipments).sort((a, b) => b.predictions[cp].p_late - a.predictions[cp].p_late), [data, cp]);
+  const idx = ordered.findIndex((s) => s.id === id);
+  const s = data.shipments[id];
+  const p = s.predictions[cp];
+  const go = (d: number) => setId(ordered[(idx + d + ordered.length) % ordered.length].id);
+  useEffect(() => {
+    document.body.style.overflow = open ? "hidden" : "";
+    return () => { document.body.style.overflow = ""; };
+  }, [open]);
+  return (
+    <div className="xl:hidden">
+      <div className="flex items-stretch gap-2">
+        <button onClick={() => go(-1)} aria-label="Previous shipment" className="grid w-10 place-items-center rounded-xl border border-stone-200 bg-white text-stone-600 active:bg-stone-100"><ChevronLeft size={18} /></button>
+        <button onClick={() => setOpen(true)} className="flex min-w-0 flex-1 items-center justify-between gap-3 rounded-xl border border-stone-200 bg-white px-3.5 py-2.5 text-left active:bg-stone-50">
+          <div className="min-w-0">
+            <div className="text-[11px] text-stone-500">Shipment {idx + 1} of {ordered.length} · tap to change</div>
+            <div className="flex items-center gap-2"><span className="num text-[15px] font-medium text-stone-900">{s.id}</span><span className="truncate text-[12px] text-stone-500">{s.lane}</span></div>
+          </div>
+          <span className="num shrink-0 rounded-md px-2 py-1 text-[12px] font-semibold" style={{ color: riskColor(p.p_late), background: riskColor(p.p_late) + "14" }}>{Math.round(p.p_late * 100)}%</span>
+        </button>
+        <button onClick={() => go(1)} aria-label="Next shipment" className="grid w-10 place-items-center rounded-xl border border-stone-200 bg-white text-stone-600 active:bg-stone-100"><ChevronRight size={18} /></button>
+      </div>
+      <AnimatePresence>
+        {open && (
+          <>
+            <motion.div className="fixed inset-0 z-[70] bg-stone-900/30" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} onClick={() => setOpen(false)} />
+            <motion.div className="fixed inset-x-0 bottom-0 z-[80]" initial={{ y: "100%" }} animate={{ y: 0 }} exit={{ y: "100%" }} transition={{ type: "spring", stiffness: 380, damping: 38 }}>
+              <ShipmentList sheet data={data} id={id} cp={cp} setId={(v) => { setId(v); setOpen(false); }} />
+            </motion.div>
+          </>
+        )}
+      </AnimatePresence>
+    </div>
   );
 }

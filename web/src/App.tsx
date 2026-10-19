@@ -9,11 +9,11 @@ import Propagation from "./views/Propagation";
 import ShipmentView from "./views/Shipment";
 
 const TABS = [
-  { key: "overview", label: "Command center", icon: Globe2 },
-  { key: "shipment", label: "Shipment intelligence", icon: Route },
-  { key: "propagation", label: "Propagation lab", icon: Waypoints },
-  { key: "evaluation", label: "Evaluation", icon: Gauge },
-  { key: "method", label: "Method", icon: BookOpen },
+  { key: "overview", label: "Command center", short: "Network", icon: Globe2 },
+  { key: "shipment", label: "Shipment intelligence", short: "Shipment", icon: Route },
+  { key: "propagation", label: "Propagation lab", short: "Propagation", icon: Waypoints },
+  { key: "evaluation", label: "Evaluation", short: "Accuracy", icon: Gauge },
+  { key: "method", label: "Method", short: "Method", icon: BookOpen },
 ] as const;
 type Tab = (typeof TABS)[number]["key"];
 
@@ -51,14 +51,14 @@ export default function App() {
       <div className="backdrop" />
       <header className="sticky top-0 z-40 border-b border-stone-200 bg-[#F7F6F2]/95">
         <div className="mx-auto flex max-w-[1680px] items-end gap-6 px-4 md:px-6">
-          <div className="flex items-center gap-2.5 py-3.5">
+          <div className="flex min-w-0 items-center gap-2.5 py-3.5">
             <svg viewBox="0 0 24 24" className="h-6 w-6" fill="none" aria-hidden>
               <rect x="1" y="1" width="22" height="22" rx="5" fill="#1C1917" />
               <path d="M5.5 15.5h4l2-4 2 6 2-4h3" stroke="#F7F6F2" strokeWidth={1.8} strokeLinecap="round" strokeLinejoin="round" />
             </svg>
-            <div className="text-[15px] font-semibold tracking-tight text-stone-900">Aiqon <span className="hidden font-normal text-stone-500 sm:inline">/ ETA &amp; delay propagation</span></div>
+            <div className="truncate text-[15px] font-semibold tracking-tight text-stone-900">Aiqon <span className="font-normal text-stone-500"><span className="hidden sm:inline">/ ETA &amp; delay propagation</span><span className="sm:hidden">/ {TABS.find((t) => t.key === tab)?.label}</span></span></div>
           </div>
-          <nav className="ml-auto flex gap-1 overflow-x-auto [scrollbar-width:none]" aria-label="Sections">
+          <nav className="ml-auto hidden gap-1 sm:flex" aria-label="Sections">
             {TABS.map((t) => (
               <button key={t.key} onClick={() => setTab(t.key)} aria-current={tab === t.key ? "page" : undefined}
                 className={`relative flex shrink-0 items-center gap-2 px-3 pb-3.5 pt-3 text-[13px] font-medium transition-colors ${tab === t.key ? "text-stone-900" : "text-stone-500 hover:text-stone-800"}`}>
@@ -71,7 +71,19 @@ export default function App() {
         </div>
       </header>
 
-      <main className="relative z-10 mx-auto max-w-[1680px] px-4 py-6 md:px-6">
+      {/* phone tab bar */}
+      <nav aria-label="Sections" className="fixed inset-x-0 bottom-0 z-50 grid grid-cols-5 border-t border-stone-200 bg-white/95 pb-[env(safe-area-inset-bottom)] sm:hidden">
+        {TABS.map((t) => (
+          <button key={t.key} onClick={() => setTab(t.key)} aria-current={tab === t.key ? "page" : undefined}
+            className={`relative flex flex-col items-center gap-1 pb-2 pt-2.5 text-[10.5px] font-medium ${tab === t.key ? "text-stone-900" : "text-stone-400"}`}>
+            {tab === t.key && <motion.span layoutId="mtab" className="absolute inset-x-5 top-0 h-0.5 rounded-full bg-stone-900" />}
+            <t.icon size={19} strokeWidth={tab === t.key ? 2.2 : 1.8} />
+            {t.short}
+          </button>
+        ))}
+      </nav>
+
+      <main className="relative z-10 mx-auto max-w-[1680px] px-3 pb-28 pt-4 sm:px-4 sm:py-6 md:px-6">
         {error && <div className="rounded-xl border border-bad/30 bg-bad/5 p-5 text-sm text-bad">Could not load dashboard data ({error}). Run <code>python -m eta.run</code> first.</div>}
         {!data && !error && <Loader />}
         {data && (

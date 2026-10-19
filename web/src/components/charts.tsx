@@ -160,7 +160,7 @@ export function Heatmap({ x, y, z, xLabel, yLabel, zLabel, height = 260, scheme 
 export function DivergingBars({ items, format = (v: number) => `${v > 0 ? "+" : ""}${v.toFixed(0)}h`, height = 26 }: { items: { label: ReactNode; value: number; color?: string; key: string; muted?: boolean }[]; format?: (v: number) => string; height?: number }) {
   const max = Math.max(1, ...items.map((i) => Math.abs(i.value)));
   return (
-    <div className="space-y-1.5">
+    <div className="space-y-2.5 sm:space-y-1.5">
       <AnimatePresence initial={false}>
         {items.map((it, k) => {
           const pct = (Math.abs(it.value) / max) * 50;
@@ -168,11 +168,11 @@ export function DivergingBars({ items, format = (v: number) => `${v > 0 ? "+" : 
           const c = it.color ?? (pos ? "#D64545" : "#1F9D6B");
           return (
             <motion.div key={it.key} layout initial={{ opacity: 0, x: -8 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: k * 0.03 }}
-              className="grid grid-cols-[minmax(0,1fr)_minmax(0,1.3fr)_52px] items-center gap-3" style={{ height }}>
-              <div className={`truncate text-[12px] ${it.muted ? "text-stone-500" : "text-stone-700"}`}>{it.label}</div>
-              <div className="relative h-full">
-                <div className="absolute inset-y-1 left-1/2 w-px bg-stone-200" />
-                <motion.div className="absolute inset-y-[5px] rounded-md" initial={{ width: 0 }} animate={{ width: `${pct}%` }} transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
+              className="grid grid-cols-[minmax(0,1fr)_52px] items-center gap-x-3 gap-y-1 sm:grid-cols-[minmax(0,1fr)_minmax(0,1.3fr)_52px]" style={{ minHeight: height }}>
+              <div className={`text-[12.5px] sm:truncate sm:text-[12px] ${it.muted ? "text-stone-500" : "text-stone-700"}`}>{it.label}</div>
+              <div className="relative order-3 col-span-2 h-[14px] sm:order-none sm:col-span-1 sm:h-full" style={{ minHeight: 14 }}>
+                <div className="absolute inset-y-0 left-1/2 w-px bg-stone-200 sm:inset-y-1" />
+                <motion.div className="absolute inset-y-[2px] rounded sm:inset-y-[5px] sm:rounded-md" initial={{ width: 0 }} animate={{ width: `${pct}%` }} transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
                   style={{ left: pos ? "50%" : undefined, right: pos ? undefined : "50%", background: c, opacity: 0.85 }} />
               </div>
               <div className="num text-right text-[12px]" style={{ color: c }}>{format(it.value)}</div>

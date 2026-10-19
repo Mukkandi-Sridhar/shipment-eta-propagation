@@ -1,6 +1,19 @@
 import { animate, motion, useInView, useMotionValue, useTransform } from "framer-motion";
 import { ReactNode, useEffect, useRef, useState } from "react";
 
+/** true below the given breakpoint (default: Tailwind `lg`). */
+export function useIsMobile(max = 1023) {
+  const q = `(max-width: ${max}px)`;
+  const [m, setM] = useState(() => typeof window !== "undefined" && window.matchMedia(q).matches);
+  useEffect(() => {
+    const mq = window.matchMedia(q);
+    const on = () => setM(mq.matches);
+    mq.addEventListener("change", on);
+    return () => mq.removeEventListener("change", on);
+  }, [q]);
+  return m;
+}
+
 export function Card({ children, className = "", delay = 0, glow = false }: { children: ReactNode; className?: string; delay?: number; glow?: boolean }) {
   return (
     <motion.div
@@ -16,7 +29,7 @@ export function Card({ children, className = "", delay = 0, glow = false }: { ch
 
 export function CardHeader({ title, kicker, right, info }: { title: ReactNode; kicker?: string; right?: ReactNode; info?: string }) {
   return (
-    <div className="flex items-start justify-between gap-3 px-5 pt-4">
+    <div className="flex flex-wrap items-start justify-between gap-x-3 gap-y-2 px-4 pt-4 sm:flex-nowrap sm:px-5">
       <div className="min-w-0">
         {kicker && <div className="mb-0.5 text-[11.5px] text-stone-500">{kicker}</div>}
         <div className="flex items-center gap-2 text-[15px] font-semibold text-stone-900">
@@ -33,11 +46,11 @@ export function InfoTip({ text }: { text: string }) {
   const [open, setOpen] = useState(false);
   return (
     <span className="relative inline-flex" onMouseEnter={() => setOpen(true)} onMouseLeave={() => setOpen(false)}>
-      <button aria-label="More info" onFocus={() => setOpen(true)} onBlur={() => setOpen(false)}
-        className="grid h-4 w-4 place-items-center rounded-full border border-stone-300 text-[9px] font-semibold text-stone-400 hover:border-accent-300 hover:text-accent-600">i</button>
+      <button aria-label="More info" aria-expanded={open} onClick={() => setOpen((o) => !o)} onBlur={() => setOpen(false)}
+        className="grid h-5 w-5 place-items-center rounded-full border border-stone-300 text-[9.5px] font-semibold normal-case text-stone-400 hover:border-accent-300 hover:text-accent-600 sm:h-4 sm:w-4 sm:text-[9px]">i</button>
       {open && (
         <motion.span initial={{ opacity: 0, y: 4 }} animate={{ opacity: 1, y: 0 }}
-          className="absolute left-1/2 top-6 z-50 w-64 -translate-x-1/2 rounded-lg border border-stone-200 bg-white p-3 text-xs font-normal leading-relaxed text-stone-700 shadow-lg">
+          className="fixed inset-x-3 bottom-20 z-[60] rounded-lg border border-stone-200 bg-white p-3.5 text-[13px] font-normal normal-case leading-relaxed text-stone-700 shadow-xl sm:absolute sm:inset-x-auto sm:bottom-auto sm:left-1/2 sm:top-6 sm:w-64 sm:-translate-x-1/2 sm:p-3 sm:text-xs">
           {text}
         </motion.span>
       )}
@@ -125,9 +138,9 @@ export function Narrative({ lines }: { lines: string[] }) {
 
 export function Stat({ label, value, sub, accent = "#2952CC", delay = 0, info }: { label: string; value: ReactNode; sub?: ReactNode; accent?: string; delay?: number; info?: string }) {
   return (
-    <Card delay={delay} className="p-4">
+    <Card delay={delay} className="p-3.5 sm:p-4">
       <div className="flex items-center gap-1.5 text-[12px] text-stone-500"><span className="h-2 w-2 rounded-sm" style={{ background: accent }} />{label}{info && <InfoTip text={info} />}</div>
-      <div className="num mt-2.5 text-[28px] font-medium leading-none text-stone-900">{value}</div>
+      <div className="num mt-2.5 text-[24px] font-medium leading-none text-stone-900 sm:text-[28px]">{value}</div>
       {sub && <div className="mt-2 text-xs text-stone-500">{sub}</div>}
     </Card>
   );

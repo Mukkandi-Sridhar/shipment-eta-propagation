@@ -38,10 +38,10 @@ export default function Evaluation({ data }: { data: AppData }) {
         <CardHeader kicker="Temporal hold-out · 90 unseen shipments (Aug–Nov departures)" title="Forecast accuracy as the journey unfolds"
           right={<Segmented size="sm" value={metric} onChange={setMetric} options={[{ value: "mae", label: "MAE" }, { value: "p90_err", label: "P90 error" }, { value: "within24", label: "Hit ±24h" }]} />}
           info="The models train on the first 70% of departures and are tested on the last 30%, the way they would be deployed. That test window includes peak season and a port strike the models barely saw, so this is a deliberately hard test." />
-        <div className="grid gap-6 p-5 pt-3 xl:grid-cols-[1.3fr_1fr]">
+        <div className="grid gap-6 p-4 pt-3 sm:p-5 sm:pt-3 xl:grid-cols-[1.3fr_1fr]">
           <LineChart series={series} height={300} xTicks={[0, 1, 2, 3, 4]} xFormat={(v) => CHECKPOINT_SHORT[v]} yFormat={(v) => metric === "within24" ? `${v.toFixed(0)}%` : `${v.toFixed(0)}h`} xLabel="Prediction checkpoint" yLabel={metric === "within24" ? "Share within ±24h" : "Error (hours)"} />
           <div className="overflow-x-auto">
-            <table className="w-full text-[12px]">
+            <table className="w-full min-w-[460px] text-[12px]">
               <thead>
                 <tr className="text-[11.5px] text-stone-500">
                   <th className="pb-2 text-left font-medium">Model</th>
@@ -87,7 +87,7 @@ export default function Evaluation({ data }: { data: AppData }) {
       <div className="grid gap-5 xl:grid-cols-3">
         <Card className="p-0">
           <CardHeader kicker="Delay-risk classification" title="P(late > 24h) quality" info="AUC: ranking quality. Brier: probabilistic accuracy (lower is better). Coverage: share of actual outcomes inside the P10–P90 interval (target 80%)." />
-          <div className="space-y-3 p-5 pt-4">
+          <div className="space-y-3 p-4 pt-4 sm:p-5 sm:pt-4">
             {[0, 1, 2, 3, 4].map((c) => {
               const r = get(c, "stage_chain"), d = get(c, "direct_gbm");
               return (
@@ -108,7 +108,7 @@ export default function Evaluation({ data }: { data: AppData }) {
         </Card>
         <Card className="p-0">
           <CardHeader kicker="Explanation quality" title="Is the blamed stage the real culprit?" info="For late test shipments, among the stages still ahead: is the stage with the largest forecast overrun the stage with the largest true overrun? Ground truth comes from the simulator." />
-          <div className="space-y-3 p-5 pt-4">
+          <div className="space-y-3 p-4 pt-4 sm:p-5 sm:pt-4">
             {S.attribution.map((a, i) => (
               <div key={a.checkpoint}>
                 <div className="mb-1 flex justify-between text-[11.5px]"><span className="text-stone-500">{CHECKPOINT_SHORT[a.checkpoint]} <span className="text-stone-400">n={a.n}</span></span><span className="num font-semibold text-accent-700">{Math.round(a.model * 100)}%</span></div>
@@ -140,7 +140,7 @@ export default function Evaluation({ data }: { data: AppData }) {
         <Card className="p-0">
           <CardHeader kicker="Route variability" title="Error by lane" right={<Segmented size="sm" value={laneCp} onChange={setLaneCp} options={[{ value: 0, label: "Booked" }, { value: 2, label: "Arrived" }]} />}
             info="MAE per lane on the test set. Lanes with few test shipments (n) are noisy." />
-          <div className="space-y-2 p-5 pt-4">
+          <div className="space-y-2 p-4 pt-4 sm:p-5 sm:pt-4">
             {S.per_lane.filter((r) => r.checkpoint === laneCp).sort((a, b) => a.stage_chain - b.stage_chain).map((r) => {
               const mx = Math.max(...S.per_lane.filter((q) => q.checkpoint === laneCp).flatMap((q) => [q.stage_chain, q.lane_history, q.direct_gbm]));
               return (

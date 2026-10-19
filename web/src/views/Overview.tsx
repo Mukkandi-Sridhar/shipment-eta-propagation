@@ -3,12 +3,13 @@ import { Pause, Play } from "lucide-react";
 import { useEffect, useMemo, useRef, useState } from "react";
 import Globe from "../components/Globe";
 import { Bars } from "../components/charts";
-import { Card, CardHeader, CountUp, Dot, Pill, Segmented, Stat } from "../components/ui";
+import { Card, CardHeader, CountUp, Dot, Pill, Segmented, Stat, useIsMobile } from "../components/ui";
 import type { AppData } from "../lib/data";
 import { CAUSE_LABELS, LANE_COLORS, STAGE_KEYS, STAGE_LABELS, fmtH, hours, riskColor } from "../lib/data";
 
 export default function Overview({ data, onOpen }: { data: AppData; onOpen: (id: string) => void }) {
   const { summary, fleet, geo, shipments } = data;
+  const phone = useIsMobile(639);
   const range = useMemo(() => {
     const lo = Math.min(...fleet.map((f) => hours(f.act.departed)));
     const hi = Math.max(...fleet.map((f) => hours(f.act.arrived)));
@@ -53,26 +54,26 @@ export default function Overview({ data, onOpen }: { data: AppData; onOpen: (id:
     <div className="space-y-5">
       <div className="grid gap-5 xl:grid-cols-[1.55fr_1fr]">
         <Card className="overflow-hidden">
-          <div className="flex flex-wrap items-start justify-between gap-4 border-b border-stone-100 px-5 py-4">
+          <div className="flex flex-wrap items-start justify-between gap-x-4 gap-y-2 border-b border-stone-100 px-4 py-3.5 sm:px-5 sm:py-4">
             <div>
               <h1 className="text-[17px] font-semibold tracking-tight text-stone-900">Network replay</h1>
               <p className="mt-0.5 text-[13px] text-stone-500">300 simulated container moves on nine lanes, coloured by how late each one finally delivers.</p>
             </div>
             <div className="flex items-center gap-4">
-              <div className="text-right">
+              <div className="sm:text-right">
                 <div className="num text-[15px] font-medium text-stone-900">{date.toLocaleDateString("en-GB", { day: "2-digit", month: "short", year: "numeric", timeZone: "UTC" })} <span className="text-stone-400">{date.toLocaleTimeString("en-GB", { hour: "2-digit", minute: "2-digit", timeZone: "UTC" })} UTC</span></div>
                 <div className="mt-0.5 text-[12px] text-stone-500"><span className="num text-stone-800">{atSea.length}</span> at sea · <span className="num text-bad">{atSeaLate}</span> will deliver late</div>
               </div>
             </div>
           </div>
-          <Globe geo={geo} fleet={fleet} clockH={clock} onPick={(id) => shipments[id] && onOpen(id)} height={500} />
-          <div className="flex flex-wrap items-center gap-x-4 gap-y-1 px-5 pb-2 text-[11.5px] text-stone-500">
+          <Globe geo={geo} fleet={fleet} clockH={clock} onPick={(id) => shipments[id] && onOpen(id)} height={phone ? 330 : 500} />
+          <div className="flex flex-wrap items-center gap-x-4 gap-y-1 px-4 pb-2.5 text-[11.5px] text-stone-500 sm:px-5">
             <span className="flex items-center gap-1.5"><Dot color="#1F9D6B" />on time (≤24h)</span>
             <span className="flex items-center gap-1.5"><Dot color="#C98200" />1–3 days late</span>
             <span className="flex items-center gap-1.5"><Dot color="#D64545" />more than 3 days late</span>
             <span className="text-stone-400">Drag to rotate, click a ship to open it.</span>
           </div>
-          <div className="flex items-center gap-3 border-t border-stone-100 px-5 py-3">
+          <div className="flex items-center gap-3 border-t border-stone-100 px-4 py-3 sm:px-5">
             <button onClick={() => setPlaying((p) => !p)} aria-label={playing ? "Pause replay" : "Play replay"}
               className="grid h-8 w-8 shrink-0 place-items-center rounded-md bg-stone-900 text-white transition hover:bg-stone-700">
               {playing ? <Pause size={14} /> : <Play size={14} className="ml-0.5" />}
@@ -84,7 +85,7 @@ export default function Overview({ data, onOpen }: { data: AppData; onOpen: (id:
           </div>
         </Card>
 
-        <div className="grid grid-cols-2 gap-4 self-start">
+        <div className="grid grid-cols-2 gap-3 self-start sm:gap-4">
           <Stat delay={0.05} label="ETA error at vessel arrival" accent="#2952CC"
             info="Mean absolute error of the final delivery-time forecast once the vessel has arrived, on 90 shipments the models never saw (temporal hold-out)."
             value={<><CountUp value={arrived.mae} decimals={1} />h</>}
@@ -124,7 +125,7 @@ export default function Overview({ data, onOpen }: { data: AppData; onOpen: (id:
       <div className="grid gap-5 lg:grid-cols-3">
         <Card delay={0.1} className="p-0">
           <CardHeader kicker="Ground truth · late shipments" title="Where delay hours come from" info="Sum of positive stage overruns across all shipments delivered >24h late. In real networks, most door-to-door delay is created on land, not at sea." />
-          <div className="p-5 pt-4">
+          <div className="p-4 pt-4 sm:p-5 sm:pt-4">
             <div className="mb-4 flex h-3 overflow-hidden rounded-full">
               {STAGE_KEYS.map((k, i) => (
                 <motion.div key={k} initial={{ width: 0 }} animate={{ width: `${(share[k] / shareTot) * 100}%` }} transition={{ duration: 1, delay: 0.2 + i * 0.08 }}
@@ -136,13 +137,13 @@ export default function Overview({ data, onOpen }: { data: AppData; onOpen: (id:
         </Card>
         <Card delay={0.15} className="p-0">
           <CardHeader kicker="Simulator event log" title="Triggered delay mechanisms" info="How many of the 300 journeys hit each mechanism. A shipment can have several." />
-          <div className="p-5 pt-4">
+          <div className="p-4 pt-4 sm:p-5 sm:pt-4">
             <Bars items={causes.map(([k, v]) => ({ key: k, label: CAUSE_LABELS[k] ?? k, value: v as number, color: "#2952CC" }))} format={(v) => `${v}`} />
           </div>
         </Card>
         <Card delay={0.2} className="p-0">
           <CardHeader kicker="Dataset" title="300 synthetic journeys, 9 lanes" info="Generated by a mechanistic simulator (eta/simulate.py). Training = first 70% of departures, test = the last 30% (Aug–Nov, peak season)." />
-          <div className="grid grid-cols-2 gap-3 p-5 pt-4">
+          <div className="grid grid-cols-2 gap-3 p-4 pt-4 sm:p-5 sm:pt-4">
             {[
               ["Late > 24h", `${(summary.dataset.late_rate * 100).toFixed(0)}%`],
               ["Median delay", fmtH(summary.dataset.median_delay)],

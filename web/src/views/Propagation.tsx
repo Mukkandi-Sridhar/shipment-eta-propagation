@@ -2,7 +2,7 @@ import * as d3 from "d3";
 import { motion } from "framer-motion";
 import { useState } from "react";
 import { Heatmap, LineChart, Scatter } from "../components/charts";
-import { Card, CardHeader, Pill } from "../components/ui";
+import { Card, CardHeader, Pill, useIsMobile } from "../components/ui";
 import type { AppData } from "../lib/data";
 import { LANE_COLORS, STAGE_KEYS, STAGE_LABELS } from "../lib/data";
 
@@ -68,18 +68,18 @@ export default function Propagation({ data }: { data: AppData }) {
 
       <Card className="p-0">
         <CardHeader kicker="Global explanation" title="Which factors matter at which stage" info="Mean absolute TreeSHAP contribution (hours) of each factor group in each stage model, on its training rows. The structure matches real operations: upstream lateness and congestion dominate at the port, the customs risk profile and calendar in customs, slot timing on the last mile." />
-        <div className="overflow-x-auto p-5 pt-4">
-          <table className="w-full min-w-[720px] border-separate border-spacing-1 text-[11.5px]">
+        <div className="overflow-x-auto p-4 pt-4 sm:p-5 sm:pt-4">
+          <table className="w-full min-w-[640px] border-separate border-spacing-1 text-[11.5px]">
             <thead>
               <tr>
-                <th className="w-48" />
+                <th className="sticky left-0 z-10 w-40 bg-white sm:w-48" />
                 {A.stage_importance.map((s, i) => <th key={s.stage} className="pb-2 font-medium" style={{ color: STAGE_COL[i] }}>{s.label}</th>)}
               </tr>
             </thead>
             <tbody>
               {groups.map((g, gi) => (
                 <tr key={g}>
-                  <td className="pr-3 text-right text-stone-500">{g}</td>
+                  <td className="sticky left-0 z-10 bg-white pr-3 text-right text-stone-500">{g}</td>
                   {A.stage_importance.map((s, i) => {
                     const v = s.groups[g];
                     const t = v / maxImp;
@@ -117,7 +117,37 @@ function Insight({ color, title, children }: { color: string; title: string; chi
 function Cascade({ data }: { data: AppData }) {
   const share = data.summary.dataset.stage_share_late;
   const tot = STAGE_KEYS.reduce((a, k) => a + share[k], 0);
+  const phone = useIsMobile(639);
   const W = 1000, H = 190;
+  if (phone) {
+    let cum = 0;
+    return (
+      <Card className="p-0">
+        <CardHeader kicker="Ground truth, all late shipments" title="Where delay is created along the journey" />
+        <div className="space-y-0 p-4 pt-3">
+          {STAGE_KEYS.map((k, i) => {
+            const sh = share[k] / tot;
+            cum += sh;
+            return (
+              <div key={k} className="grid grid-cols-[14px_1fr] gap-3">
+                <div className="flex flex-col items-center">
+                  <span className="mt-1.5 h-3 w-3 rounded-full border-2 bg-white" style={{ borderColor: STAGE_COL[i] }} />
+                  {i < 4 && <span className="w-px flex-1 bg-stone-200" />}
+                </div>
+                <div className="pb-4">
+                  <div className="flex items-baseline justify-between text-[13.5px]"><span className="font-medium text-stone-800">{STAGE_LABELS[i]}</span><span className="num text-stone-900">{Math.round(sh * 100)}%</span></div>
+                  <div className="mt-1.5 h-2 overflow-hidden rounded-full bg-stone-100">
+                    <motion.div className="h-full rounded-full" style={{ background: STAGE_COL[i] }} initial={{ width: 0 }} animate={{ width: `${sh * 250}%` }} transition={{ duration: 0.8, delay: i * 0.08 }} />
+                  </div>
+                  <div className="mt-1 text-[11.5px] text-stone-500">Running total: <span className="num">{Math.round(cum * 100)}%</span> of delay hours</div>
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      </Card>
+    );
+  }
   const xs = STAGE_KEYS.map((_, i) => 90 + i * 185);
   return (
     <Card className="overflow-hidden p-0" glow>

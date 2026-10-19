@@ -16,6 +16,8 @@ body,
   min-height: 100%;
 }
 
+html { overflow-x: hidden; }
+
 body {
   font-family: "IBM Plex Sans", system-ui, sans-serif;
   -webkit-font-smoothing: antialiased;
@@ -28,11 +30,15 @@ body {
   letter-spacing: -0.01em;
 }
 
+/* grid items may shrink below their content width (charts measure their container) */
+.grid > * { min-width: 0; }
+
 /* plain paper backdrop; kept as a hook so layout code stays unchanged */
 .backdrop { display: none; }
 
 /* card surface */
 .glass {
+  min-width: 0; /* let grid/flex tracks shrink; wide charts scroll inside their card */
   background: #ffffff;
   border: 1px solid #e7e5e0;
   box-shadow: 0 1px 2px rgba(28, 25, 23, 0.04);

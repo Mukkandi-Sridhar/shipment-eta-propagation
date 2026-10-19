@@ -15,7 +15,7 @@ export default function Method() {
     <div className="space-y-5">
       <Card className="p-0" glow>
         <CardHeader kicker="System design" title={<span className="flex items-center gap-2"><Workflow size={15} className="text-accent-600" />From raw events to an explained ETA</span>} />
-        <div className="grid gap-3 p-5 pt-4 md:grid-cols-5">
+        <div className="grid gap-3 p-4 pt-4 sm:p-5 sm:pt-4 md:grid-cols-5">
           {STEPS.map((s, i) => (
             <motion.div key={s.title} initial={{ opacity: 0, y: 14 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 + i * 0.1 }}
               className="relative rounded-2xl border border-stone-200 bg-stone-50 p-4">
@@ -34,7 +34,7 @@ export default function Method() {
       <div className="grid gap-5 lg:grid-cols-2">
         <Card className="p-0">
           <CardHeader kicker="Definitions" title="How ETA and delay are measured" />
-          <div className="space-y-3 p-5 pt-4 text-[12.5px] leading-relaxed text-stone-700">
+          <div className="space-y-3 p-4 pt-4 sm:p-5 sm:pt-4 text-[12.5px] leading-relaxed text-stone-700">
             <Def k="Promised delivery">Carrier schedule + planned port, customs and inland buffers, fixed at booking (for rail: the first ramp departure after the appointment).</Def>
             <Def k="Delivery delay">Actual proof-of-delivery − promised delivery, in hours. <span className="text-stone-500">Late</span> = delay &gt; 24h.</Def>
             <Def k="Stage overrun">(actual end − actual start) − (scheduled end − scheduled start). Overruns sum to the delivery delay.</Def>
@@ -45,7 +45,7 @@ export default function Method() {
         </Card>
         <Card className="p-0">
           <CardHeader kicker="Mechanisms in the simulator" title={<span className="flex items-center gap-2"><Boxes size={15} className="text-[#7C5CC4]" />Real logistics behaviour encoded</span>} />
-          <div className="grid gap-2 p-5 pt-4 text-[12px] text-stone-700 sm:grid-cols-2">
+          <div className="grid gap-2 p-4 pt-4 sm:p-5 sm:pt-4 text-[12px] text-stone-700 sm:grid-cols-2">
             {[
               ["Rollovers", "Congested origin + low-reliability carrier → cargo bumped to next week's sailing (+168h)."],
               ["Speed recovery", "Late vessels steam faster, recovering up to ~4.5% of the transit time."],
@@ -64,7 +64,7 @@ export default function Method() {
 
       <Card className="p-0">
         <CardHeader kicker="Read before trusting the numbers" title={<span className="flex items-center gap-2"><AlertTriangle size={15} className="text-amber-300" />Assumptions and limitations</span>} />
-        <div className="grid gap-x-8 gap-y-2 p-5 pt-4 text-[12.5px] leading-relaxed text-stone-500 md:grid-cols-2">
+        <div className="grid gap-x-8 gap-y-2 p-4 pt-4 sm:p-5 sm:pt-4 text-[12.5px] leading-relaxed text-stone-500 md:grid-cols-2">
           {[
             "The data is synthetic. The model recovers mechanisms I wrote into the simulator, so good scores show the method works, not that real-world accuracy is known.",
             "90 test shipments is small: lane-level numbers are noisy, and confidence intervals are reported for that reason.",
