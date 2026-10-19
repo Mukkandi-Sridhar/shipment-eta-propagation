@@ -2,7 +2,7 @@ import * as d3 from "d3";
 import { motion } from "framer-motion";
 import { useState } from "react";
 import { Heatmap, LineChart, Scatter } from "../components/charts";
-import { Card, CardHeader, Pill, useIsMobile } from "../components/ui";
+import { Card, CardHeader, PageHeader, Pill, useIsMobile } from "../components/ui";
 import type { AppData } from "../lib/data";
 import { LANE_COLORS, STAGE_KEYS, STAGE_LABELS } from "../lib/data";
 
@@ -21,6 +21,7 @@ export default function Propagation({ data }: { data: AppData }) {
 
   return (
     <div className="space-y-5">
+      <PageHeader title="Delay propagation" sub="How lateness at one stage turns into more (or less) delay later on. These are the mechanisms the stage-chain model learned from data; it was never given the rules." />
       <Cascade data={data} />
       <div className="grid gap-5 xl:grid-cols-[1.4fr_1fr]">
         <Card className="p-0">

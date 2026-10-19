@@ -145,3 +145,34 @@ export function Stat({ label, value, sub, accent = "#2952CC", delay = 0, info }:
     </Card>
   );
 }
+
+/** Page title block: what this page is for, in one line. */
+export function PageHeader({ title, sub, right }: { title: string; sub: ReactNode; right?: ReactNode }) {
+  return (
+    <div className="mb-4 flex flex-wrap items-end justify-between gap-3 sm:mb-5">
+      <div className="max-w-3xl">
+        <h1 className="text-[20px] font-semibold tracking-tight text-stone-900 sm:text-[24px]">{title}</h1>
+        <p className="mt-1 text-[13.5px] leading-relaxed text-stone-500 sm:text-[14px]">{sub}</p>
+      </div>
+      {right}
+    </div>
+  );
+}
+
+/** Tiny line of a value across the five checkpoints. */
+export function Spark({ values, color = "#2952CC", w = 64, h = 20, max = 1 }: { values: number[]; color?: string; w?: number; h?: number; max?: number }) {
+  const n = values.length - 1;
+  const pts = values.map((v, i) => `${(i / n) * (w - 4) + 2},${h - 2 - (Math.min(v, max) / max) * (h - 4)}`).join(" ");
+  const last = pts.split(" ").pop()!.split(",");
+  return (
+    <svg width={w} height={h} aria-hidden className="shrink-0">
+      <line x1={2} x2={w - 2} y1={h - 2 - 0.5 * (h - 4)} y2={h - 2 - 0.5 * (h - 4)} stroke="#E7E5E0" strokeDasharray="2 2" />
+      <polyline points={pts} fill="none" stroke={color} strokeWidth={1.5} strokeLinejoin="round" />
+      <circle cx={+last[0]} cy={+last[1]} r={2.2} fill={color} />
+    </svg>
+  );
+}
+
+export function Kbd({ children }: { children: ReactNode }) {
+  return <kbd className="num rounded border border-stone-300 bg-white px-1.5 py-0.5 text-[10.5px] text-stone-500 shadow-[0_1px_0_#d6d3cd]">{children}</kbd>;
+}

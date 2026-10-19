@@ -1,6 +1,6 @@
 import { motion } from "framer-motion";
 import { AlertTriangle, Boxes, Calculator, Database, GitBranch, Layers, Microscope, Workflow } from "lucide-react";
-import { Card, CardHeader } from "../components/ui";
+import { Card, CardHeader, PageHeader } from "../components/ui";
 
 const STEPS = [
   { icon: Database, title: "Mechanistic simulator", body: "300 journeys on 9 lanes. Port utilisation and weather are daily time series shared by every ship in the same place at the same time, so delays are correlated the way real ones are." },
@@ -13,6 +13,7 @@ const STEPS = [
 export default function Method() {
   return (
     <div className="space-y-5">
+      <PageHeader title="Method" sub="How the data was generated, how ETA and delay are defined, how the model works, and what it cannot do." />
       <Card className="p-0" glow>
         <CardHeader kicker="System design" title={<span className="flex items-center gap-2"><Workflow size={15} className="text-accent-600" />From raw events to an explained ETA</span>} />
         <div className="grid gap-3 p-4 pt-4 sm:p-5 sm:pt-4 md:grid-cols-5">

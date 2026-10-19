@@ -16,12 +16,12 @@ body,
   min-height: 100%;
 }
 
-html { overflow-x: hidden; }
+html { overflow-x: clip; }
 
 body {
   font-family: "IBM Plex Sans", system-ui, sans-serif;
   -webkit-font-smoothing: antialiased;
-  overflow-x: hidden;
+  overflow-x: clip;
 }
 
 .num {

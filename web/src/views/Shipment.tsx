@@ -3,7 +3,7 @@ import { Anchor, ArrowRight, ChevronLeft, ChevronRight, Eye, EyeOff, FileWarning
 import { useEffect, useMemo, useRef, useState } from "react";
 import { DelayWaterfall, JourneyTimeline } from "../components/journey";
 import { DivergingBars, Histogram, LineChart } from "../components/charts";
-import { Card, CardHeader, CountUp, Gauge, Pill, Segmented, Narrative } from "../components/ui";
+import { Card, CardHeader, CountUp, Gauge, Kbd, Pill, Segmented, Narrative } from "../components/ui";
 import { apiAlive, whatIf } from "../lib/api";
 import type { AppData, Prediction, ShipmentDetail } from "../lib/data";
 import { CAUSE_LABELS, CHECKPOINT_SHORT, LANE_COLORS, STAGE_KEYS, STAGE_LABELS, fmtDate, fmtH, riskColor } from "../lib/data";
@@ -21,6 +21,35 @@ export default function ShipmentView({ data, id, setId }: { data: AppData; id: s
     return () => clearInterval(t);
   }, [playing]);
 
+  // keyboard: ←/→ checkpoints, J/K next/previous shipment (by risk), R reveal
+  const order = useMemo(() => Object.values(data.shipments).sort((a, b) => b.predictions[cp].p_late - a.predictions[cp].p_late).map((x) => x.id), [data, cp]);
+  useEffect(() => {
+    const on = (e: KeyboardEvent) => {
+      if ((e.target as HTMLElement)?.closest("input, textarea, [role=dialog]") || e.metaKey || e.ctrlKey || e.altKey) return;
+      const i = order.indexOf(id);
+      if (e.key === "ArrowRight") { setPlaying(false); setCp((c) => Math.min(4, c + 1)); }
+      else if (e.key === "ArrowLeft") { setPlaying(false); setCp((c) => Math.max(0, c - 1)); }
+      else if (e.key === "j") setId(order[(i + 1) % order.length]);
+      else if (e.key === "k") setId(order[(i - 1 + order.length) % order.length]);
+      else if (e.key === "r") setReveal((v) => !v);
+      else return;
+      e.preventDefault();
+    };
+    window.addEventListener("keydown", on);
+    return () => window.removeEventListener("keydown", on);
+  }, [order, id, setId]);
+
+  // compact summary once the forecast card scrolls out of view
+  const etaRef = useRef<HTMLDivElement>(null);
+  const [stuck, setStuck] = useState(false);
+  useEffect(() => {
+    const el = etaRef.current;
+    if (!el) return;
+    const io = new IntersectionObserver(([e]) => setStuck(!e.isIntersecting && e.boundingClientRect.top < 0), { rootMargin: "-60px 0px 0px 0px" });
+    io.observe(el);
+    return () => io.disconnect();
+  }, []);
+
   const base = s.predictions[cp];
   const p = scenario ?? base;
 
@@ -35,6 +64,11 @@ export default function ShipmentView({ data, id, setId }: { data: AppData; id: s
         <Card className="p-4" delay={0.05}>
           <div className="flex flex-col gap-4 sm:flex-row sm:flex-wrap sm:items-center sm:justify-between">
             <CheckpointStepper cp={cp} setCp={(c) => { setPlaying(false); setCp(c); }} s={s} />
+            <div className="hidden items-center gap-3 text-[11.5px] text-stone-400 2xl:flex">
+              <span className="flex items-center gap-1"><Kbd>←</Kbd><Kbd>→</Kbd> checkpoint</span>
+              <span className="flex items-center gap-1"><Kbd>J</Kbd><Kbd>K</Kbd> shipment</span>
+              <span className="flex items-center gap-1"><Kbd>R</Kbd> actual</span>
+            </div>
             <div className="grid grid-cols-2 gap-2 sm:flex sm:items-center">
               <button onClick={() => { if (cp >= 4) setCp(0); setPlaying((v) => !v); }}
                 className="flex items-center justify-center gap-2 rounded-xl border border-accent-200 bg-accent-50 px-3 py-2 text-xs font-medium text-accent-700 transition hover:bg-accent-100">
@@ -48,8 +82,30 @@ export default function ShipmentView({ data, id, setId }: { data: AppData; id: s
           </div>
         </Card>
 
+        <AnimatePresence>
+          {stuck && (
+            <motion.div initial={{ y: -12, opacity: 0 }} animate={{ y: 0, opacity: 1 }} exit={{ y: -12, opacity: 0 }} transition={{ duration: 0.18 }}
+              className="fixed inset-x-0 top-[53px] z-30 border-b border-stone-200 bg-white/95 sm:top-[57px]">
+              <div className="mx-auto flex max-w-[1680px] items-center gap-3 px-3 py-2 sm:gap-5 sm:px-6 xl:pl-[344px]">
+                <span className="num text-[13px] font-medium text-stone-900">{s.id}</span>
+                <span className="hidden text-[12px] text-stone-500 sm:inline">{s.lane}</span>
+                <div className="flex gap-0.5">
+                  {CHECKPOINT_SHORT.map((l, i) => (
+                    <button key={l} onClick={() => setCp(i)} aria-label={`Checkpoint ${l}`} title={l}
+                      className={`h-1.5 w-5 rounded-full sm:w-7 ${i === cp ? "bg-accent-600" : i < cp ? "bg-accent-200" : "bg-stone-200"}`} />
+                  ))}
+                </div>
+                <span className="hidden text-[12px] text-stone-500 md:inline">{p.checkpoint_label}</span>
+                <span className="ml-auto text-[12px] text-stone-500">ETA <span className="num text-stone-900">{fmtDate(p.eta_p50)}</span></span>
+                <span className="num text-[12px] text-stone-700">{fmtH(p.delay_p50_h)}</span>
+                <span className="num rounded-md px-1.5 py-0.5 text-[12px] font-semibold" style={{ color: riskColor(p.p_late), background: riskColor(p.p_late) + "14" }}>{Math.round(p.p_late * 100)}%</span>
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
+
         <div className="grid gap-5 2xl:grid-cols-[1.05fr_1fr]">
-          <EtaCard s={s} p={p} reveal={reveal} scenario={!!scenario} />
+          <div ref={etaRef}><EtaCard s={s} p={p} reveal={reveal} scenario={!!scenario} /></div>
           <Card delay={0.1} className="p-0">
             <CardHeader kicker={scenario ? "What-if scenario" : p.checkpoint_label} title="Why this forecast"
               info="Generated from the model's own numbers (stage forecasts, knock-on counterfactuals, SHAP factor sums), so every sentence traces back to a quantity on this page. Template-based, not an LLM, so it cannot invent causes." />

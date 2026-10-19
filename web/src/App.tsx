@@ -1,5 +1,6 @@
 import { AnimatePresence, motion } from "framer-motion";
-import { BookOpen, Gauge, Globe2, Route, Waypoints } from "lucide-react";
+import { BookOpen, Gauge, Globe2, Route, Search, Waypoints } from "lucide-react";
+import CommandPalette from "./components/CommandPalette";
 import { useEffect, useState } from "react";
 import { useAppData } from "./lib/data";
 import Evaluation from "./views/Evaluation";
@@ -26,6 +27,7 @@ export default function App() {
   const { data, error } = useAppData();
   const [tab, setTab] = useState<Tab>(readHash().tab);
   const [id, setId] = useState<string | null>(readHash().id ?? null);
+  const [palette, setPalette] = useState(false);
 
   useEffect(() => {
     const on = () => { const h = readHash(); setTab(h.tab); if (h.id) setId(h.id); };
@@ -58,6 +60,10 @@ export default function App() {
             </svg>
             <div className="truncate text-[15px] font-semibold tracking-tight text-stone-900">Aiqon <span className="font-normal text-stone-500"><span className="hidden sm:inline">/ ETA &amp; delay propagation</span><span className="sm:hidden">/ {TABS.find((t) => t.key === tab)?.label}</span></span></div>
           </div>
+          <button onClick={() => setPalette(true)} aria-label="Find a shipment"
+            className="ml-auto flex items-center gap-2 self-center rounded-lg border border-stone-200 bg-white px-2.5 py-1.5 text-[12.5px] text-stone-500 hover:border-stone-300 hover:text-stone-800 sm:order-last sm:ml-2">
+            <Search size={14} /><span className="hidden lg:inline">Find shipment</span><kbd className="num hidden rounded border border-stone-200 px-1 text-[10px] text-stone-400 lg:inline">⌘K</kbd>
+          </button>
           <nav className="ml-auto hidden gap-1 sm:flex" aria-label="Sections">
             {TABS.map((t) => (
               <button key={t.key} onClick={() => setTab(t.key)} aria-current={tab === t.key ? "page" : undefined}
@@ -70,6 +76,9 @@ export default function App() {
           </nav>
         </div>
       </header>
+
+      <CommandPalette data={data} open={palette} setOpen={setPalette} views={TABS.map((t) => ({ key: t.key, label: t.label }))}
+        onView={(k) => setTab(k as Tab)} onShip={open} />
 
       {/* phone tab bar */}
       <nav aria-label="Sections" className="fixed inset-x-0 bottom-0 z-50 grid grid-cols-5 border-t border-stone-200 bg-white/95 pb-[env(safe-area-inset-bottom)] sm:hidden">

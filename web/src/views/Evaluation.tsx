@@ -1,7 +1,7 @@
 import { motion } from "framer-motion";
 import { useState } from "react";
 import { LineChart } from "../components/charts";
-import { Card, CardHeader, Pill, Segmented } from "../components/ui";
+import { Card, CardHeader, PageHeader, Pill, Segmented } from "../components/ui";
 import type { AppData } from "../lib/data";
 import { CHECKPOINT_SHORT, LANE_COLORS } from "../lib/data";
 
@@ -34,6 +34,7 @@ export default function Evaluation({ data }: { data: AppData }) {
 
   return (
     <div className="space-y-5">
+      <PageHeader title="How accurate is it?" sub="Trained on January–August departures and tested on the 90 that followed, compared with four simpler methods. Weak spots are shown too, not just the wins." />
       <Card className="p-0" glow>
         <CardHeader kicker="Temporal hold-out · 90 unseen shipments (Aug–Nov departures)" title="Forecast accuracy as the journey unfolds"
           right={<Segmented size="sm" value={metric} onChange={setMetric} options={[{ value: "mae", label: "MAE" }, { value: "p90_err", label: "P90 error" }, { value: "within24", label: "Hit ±24h" }]} />}
